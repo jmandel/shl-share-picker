@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Zero-Trust Web Rails Demo</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: white;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 48px;
+      margin: 0 0 16px 0;
+      font-weight: 700;
+    }
+    .subtitle {
+      font-size: 20px;
+      margin-bottom: 40px;
+      opacity: 0.9;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 24px;
+      color: #1e293b;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    }
+    .card h2 {
+      margin: 0 0 16px 0;
+      font-size: 24px;
+      color: #1e3a8a;
+    }
+    .card p {
+      margin: 0 0 16px 0;
+      line-height: 1.6;
+      color: #475569;
+    }
+    .buttons {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: #3b82f6;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+    .btn-secondary {
+      background: #10b981;
+      color: white;
+    }
+    .btn-secondary:hover {
+      background: #059669;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+    .feature-list {
+      margin: 24px 0;
+      padding: 0;
+      list-style: none;
+    }
+    .feature-list li {
+      padding: 12px 0;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      gap: 12px;
+    }
+    .feature-list li:last-child {
+      border-bottom: none;
+    }
+    .feature-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .mode-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      background: rgba(59, 130, 246, 0.2);
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #1e40af;
+      margin-bottom: 16px;
+    }
+    .code {
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 14px;
+      color: #1e293b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔐 Zero-Trust Web Rails</h1>
+    <div class="subtitle">Secure health credential sharing with Navigator Credentials API</div>
+
+    <div class="card">
+      <div class="mode-badge" id="mode-badge">Loading...</div>
+      <h2>Try the Demo</h2>
+      <p>
+        This demonstrates a secure credential sharing flow where a gateway helps users select their
+        health data source, but never sees the actual data being shared. All sensitive information
+        travels directly from the source to the requester.
+      </p>
+      <div class="buttons">
+        <a href="./requester/" class="btn btn-primary">
+          <span>🏥</span>
+          <span>Launch Requester Demo</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Key Features</h2>
+      <ul class="feature-list">
+        <li>
+          <span class="feature-icon">🔒</span>
+          <div>
+            <strong>Zero-Trust Architecture</strong><br>
+            Gateway never sees response data - true zero-knowledge mediation
+          </div>
+        </li>
+        <li>
+          <span class="feature-icon">🌐</span>
+          <div>
+            <strong>Cross-Origin Support</strong><br>
+            Works across different domains using BroadcastChannel API
+          </div>
+        </li>
+        <li>
+          <span class="feature-icon">📱</span>
+          <div>
+            <strong>Navigator Credentials Compatible</strong><br>
+            Follows <span class="code">navigator.credentials.get()</span> API pattern
+          </div>
+        </li>
+        <li>
+          <span class="feature-icon">🏗️</span>
+          <div>
+            <strong>Static Hosting Only</strong><br>
+            No server-side state required - works on GitHub Pages, Netlify, etc.
+          </div>
+        </li>
+        <li>
+          <span class="feature-icon">🔐</span>
+          <div>
+            <strong>Hash-Only Transport</strong><br>
+            All sensitive data in hash fragments (never in query params or URLs)
+          </div>
+        </li>
+        <li>
+          <span class="feature-icon">🏥</span>
+          <div>
+            <strong>Health Data Standards</strong><br>
+            Supports FHIR, SMART Health Cards, US Core profiles
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>How It Works</h2>
+      <p>
+        <strong>1.</strong> Requester initiates credential request using Navigator Credentials API format<br>
+        <strong>2.</strong> Gateway opens showing available health data sources<br>
+        <strong>3.</strong> User selects their preferred source (Flexpa, b.well, or Premera)<br>
+        <strong>4.</strong> Source opens, user reviews request and authorizes<br>
+        <strong>5.</strong> Data returns directly to requester via BroadcastChannel<br>
+        <strong>6.</strong> Gateway never sees the response - zero-trust achieved
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>Testing Modes</h2>
+      <p>
+        <strong>Multi-Origin (localhost):</strong><br>
+        When running on <span class="code">*.localhost</span> domains, the demo uses different
+        subdomains/ports to demonstrate true cross-origin flow.
+      </p>
+      <p style="margin-top: 16px;">
+        <strong>Single-Origin (GitHub Pages):</strong><br>
+        When deployed to GitHub Pages, all components run under the same origin at different
+        subpaths, using BroadcastChannel for same-origin communication.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>Learn More</h2>
+      <div class="buttons">
+        <a href="https://github.com/jmandel/shl-share-picker" class="btn btn-secondary" target="_blank">
+          <span>📚</span>
+          <span>View on GitHub</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script src="./config.js"></script>
+  <script>
+    // Show current mode
+    const modeBadge = document.getElementById('mode-badge');
+    modeBadge.textContent = ZTWRConfig.mode === 'multi-origin'
+      ? '🌐 Multi-Origin Mode (localhost)'
+      : '🌍 Single-Origin Mode (GitHub Pages)';
+  </script>
+</body>
+</html>

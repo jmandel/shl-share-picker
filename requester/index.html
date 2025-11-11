@@ -1,0 +1,379 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Healthcare Portal - ZTWR Demo</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: white;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    h1 {
+      font-size: 36px;
+      margin: 0 0 12px 0;
+      font-weight: 700;
+    }
+    .tagline {
+      font-size: 18px;
+      opacity: 0.9;
+    }
+    .card {
+      background: white;
+      color: #1a202c;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      margin-bottom: 24px;
+    }
+    .card h2 {
+      margin: 0 0 16px 0;
+      font-size: 24px;
+      color: #1e3a8a;
+    }
+    .card p {
+      margin: 0 0 24px 0;
+      line-height: 1.6;
+      color: #4a5568;
+    }
+    .demo-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    button {
+      padding: 16px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-primary {
+      background: #3b82f6;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+    }
+    .btn-primary:disabled {
+      background: #cbd5e0;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-secondary {
+      background: #10b981;
+      color: white;
+    }
+    .btn-secondary:hover {
+      background: #059669;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+    }
+    .result {
+      margin-top: 24px;
+      padding: 20px;
+      background: #f7fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      display: none;
+    }
+    .result.show {
+      display: block;
+    }
+    .result.success {
+      background: #d1fae5;
+      border-color: #6ee7b7;
+    }
+    .result.error {
+      background: #fee2e2;
+      border-color: #fca5a5;
+    }
+    .result h3 {
+      margin: 0 0 12px 0;
+      font-size: 18px;
+      color: #1a202c;
+    }
+    .result pre {
+      background: white;
+      padding: 16px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.5;
+      margin: 12px 0 0 0;
+    }
+    .info-box {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      padding: 16px;
+      border-radius: 4px;
+      margin-top: 24px;
+    }
+    .info-box h3 {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+      color: #1e3a8a;
+    }
+    .info-box p {
+      margin: 0;
+      font-size: 14px;
+      color: #1e40af;
+      line-height: 1.6;
+    }
+    .info-box code {
+      background: white;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 13px;
+    }
+    .loader {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .items-list {
+      margin-top: 16px;
+    }
+    .item {
+      background: white;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+    }
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .item-label {
+      font-weight: 600;
+      color: #1a202c;
+    }
+    .item-type {
+      font-size: 12px;
+      color: #64748b;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🏥 Healthcare Portal</h1>
+      <div class="tagline">Zero-Trust Web Rails Demo</div>
+    </header>
+
+    <div class="card">
+      <h2>Request Health Credentials</h2>
+      <p>
+        This demo shows how to securely request health credentials using the Zero-Trust Web Rails pattern.
+        Select what you'd like to request below, then choose from available health data sources.
+      </p>
+
+      <div style="margin: 24px 0;">
+        <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600; color: #1e3a8a;">What would you like to request?</h3>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <label style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #f8fafc; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='transparent'">
+            <input type="checkbox" id="req-insurance" style="width: 20px; height: 20px; accent-color: #3b82f6; cursor: pointer;" onchange="updateBorder(this)">
+            <div>
+              <div style="font-weight: 600; color: #1e3a8a; margin-bottom: 4px;">🏥 Digital Insurance Card</div>
+              <div style="font-size: 13px; color: #64748b;">Request your insurance coverage information</div>
+            </div>
+          </label>
+          <label style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #f8fafc; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s;" onmouseover="this.style.borderColor='#10b981'" onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='transparent'">
+            <input type="checkbox" id="req-clinical" checked style="width: 20px; height: 20px; accent-color: #10b981; cursor: pointer;" onchange="updateBorder(this)">
+            <div>
+              <div style="font-weight: 600; color: #1e3a8a; margin-bottom: 4px;">📊 Clinical Data</div>
+              <div style="font-size: 13px; color: #64748b;">Request your health records (US Core Patient Bundle)</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="btn-request" onclick="makeCustomRequest()" style="width: 100%; padding: 16px; font-size: 16px;">
+        Request Selected Data
+      </button>
+
+      <div class="info-box">
+        <h3>🔒 How it works</h3>
+        <p>
+          <strong>1.</strong> Select what data you want to request<br>
+          <strong>2.</strong> A gateway opens to choose your health data source<br>
+          <strong>3.</strong> Select a source (Flexpa, b.well, or Premera Blue Cross)<br>
+          <strong>4.</strong> The source returns data directly to THIS page (bypassing the gateway)<br>
+          <strong>5.</strong> Gateway never sees your data — true zero-trust architecture
+        </p>
+      </div>
+
+      <div id="result" class="result">
+        <h3 id="result-title">Result</h3>
+        <div id="result-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../config.js"></script>
+  <script src="./shl.js"></script>
+  <script>
+  (async () => {
+    // Check if this is a return context
+    const isReturn = await SHL.maybeHandleReturn();
+    if (isReturn) {
+      // This tab handled the return and will close
+      return;
+    }
+
+    // Main requester logic
+    const resultDiv = document.getElementById('result');
+    const resultTitle = document.getElementById('result-title');
+    const resultContent = document.getElementById('result-content');
+
+    function showResult(title, content, type = 'success') {
+      resultTitle.textContent = title;
+      resultContent.innerHTML = content;
+      resultDiv.className = 'result show ' + type;
+      resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function showLoading(button) {
+      button.disabled = true;
+      const originalHTML = button.innerHTML;
+      button.innerHTML = '<span class="loader"></span><span>Processing...</span>';
+      return () => {
+        button.disabled = false;
+        button.innerHTML = originalHTML;
+      };
+    }
+
+    async function makeRequest(credentialRequest, description) {
+      const buttons = document.querySelectorAll('button');
+      const stopLoading = showLoading(event.target);
+
+      try {
+        console.log('[Requester] Starting request:', credentialRequest);
+
+        const result = await SHL.request(
+          credentialRequest,
+          { gatewayBase: ZTWRConfig.requester.gateway }
+        );
+
+        console.log('[Requester] Got result:', result);
+
+        // Parse the payload
+        const payload = JSON.parse(result.data);
+        console.log('[Requester] Parsed payload:', payload);
+
+        // Display items
+        let html = `<div class="items-list">`;
+        html += `<div style="margin-bottom:16px;color:#1a202c"><strong>${payload.items.length} item(s) received:</strong></div>`;
+
+        payload.items.forEach((item, idx) => {
+          html += `
+            <div class="item">
+              <div class="item-header">
+                <span class="item-label">${item.label || 'Item ' + (idx + 1)}</span>
+                <span class="item-type">${item.contentType}</span>
+              </div>
+              <details>
+                <summary style="cursor:pointer;color:#3b82f6">View data</summary>
+                <pre style="margin-top:8px;font-size:12px">${JSON.stringify(item.body, null, 2)}</pre>
+              </details>
+            </div>
+          `;
+        });
+
+        html += `</div>`;
+
+        showResult(`✓ ${description} Received`, html, 'success');
+      } catch (error) {
+        console.error('[Requester] Error:', error);
+        showResult('❌ Error', `<p style="color:#991b1b">${error.message}</p>`, 'error');
+      } finally {
+        stopLoading();
+      }
+    }
+
+    window.updateBorder = (checkbox) => {
+      const label = checkbox.closest('label');
+      if (checkbox.checked) {
+        label.style.borderColor = checkbox.style.accentColor;
+      } else {
+        label.style.borderColor = 'transparent';
+      }
+    };
+
+    window.makeCustomRequest = () => {
+      const wantInsurance = document.getElementById('req-insurance').checked;
+      const wantClinical = document.getElementById('req-clinical').checked;
+
+      if (!wantInsurance && !wantClinical) {
+        showResult('⚠️ Selection Required', '<p style="color:#92400e">Please select at least one type of data to request.</p>', 'error');
+        return;
+      }
+
+      const data = {};
+      const descriptions = [];
+
+      if (wantInsurance) {
+        data.Coverage = {
+          _profile: 'http://hl7.org/fhir/us/insurance-card/StructureDefinition/C4DIC-Coverage'
+        };
+        descriptions.push('Insurance Card');
+      }
+
+      if (wantClinical) {
+        data.USCorePatientBundle = {
+          _profile: 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient'
+        };
+        descriptions.push('Clinical Data');
+      }
+
+      const description = descriptions.join(' + ');
+
+      // Use Navigator Credentials API format
+      makeRequest({
+        digital: {
+          requests: [{
+            protocol: 'smart-health-card',
+            data: data
+          }]
+        }
+      }, description);
+    };
+
+    console.log('[Requester] Page loaded and ready');
+  })();
+  </script>
+</body>
+</html>

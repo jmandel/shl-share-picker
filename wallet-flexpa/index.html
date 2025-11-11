@@ -1,0 +1,406 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Flexpa - Health Data Access</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #0d9488 0%, #84cc16 100%);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.98);
+      color: #0f172a;
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    .logo {
+      display: flex;
+      gap: 2px;
+      margin-bottom: 16px;
+      justify-content: center;
+    }
+    .pixel {
+      width: 12px;
+      height: 12px;
+      background: #0d9488;
+    }
+    .pixel:nth-child(4), .pixel:nth-child(5) {
+      background: #84cc16;
+    }
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: 28px;
+      text-align: center;
+      color: #0d9488;
+      font-weight: 700;
+    }
+    .subtitle {
+      text-align: center;
+      color: #64748b;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+    .request-box {
+      background: #f1f5f9;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .request-box h2 {
+      margin: 0 0 12px 0;
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .request-detail {
+      margin: 6px 0;
+      font-size: 13px;
+    }
+    .label {
+      color: #64748b;
+      font-weight: 500;
+    }
+    .value {
+      color: #1e293b;
+      font-family: monospace;
+      font-size: 12px;
+    }
+    .section {
+      margin: 20px 0;
+    }
+    .section h3 {
+      margin: 0 0 12px 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: #0d9488;
+    }
+    .checkbox-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 12px 0;
+    }
+    label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      color: #334155;
+      transition: background 0.15s;
+    }
+    label:hover {
+      background: #f1f5f9;
+    }
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #0d9488;
+      cursor: pointer;
+    }
+    .card-preview {
+      background: white;
+      border: 2px solid #0d9488;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 12px 0;
+      box-shadow: 0 2px 8px rgba(13, 148, 136, 0.1);
+    }
+    .card-preview h4 {
+      margin: 0 0 8px 0;
+      font-size: 14px;
+      color: #0d9488;
+      font-weight: 600;
+    }
+    .card-info {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #475569;
+    }
+    .card-info div {
+      margin: 4px 0;
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    button {
+      flex: 1;
+      padding: 14px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: #0d9488;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #0f766e;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+    }
+    .btn-primary:disabled {
+      background: #cbd5e0;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #475569;
+    }
+    .btn-secondary:hover {
+      background: #cbd5e0;
+    }
+    .note {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 12px;
+      padding: 12px;
+      background: #f8fafc;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <div class="pixel"></div>
+      <div class="pixel"></div>
+      <div class="pixel"></div>
+      <div class="pixel"></div>
+      <div class="pixel"></div>
+      <div class="pixel"></div>
+    </div>
+    <h1>Flexpa</h1>
+    <div class="subtitle">Building blocks of health data</div>
+
+    <div id="content">
+      <div class="request-box">
+        <h2>Share Request</h2>
+        <div class="request-detail">
+          <div class="label">Protocol:</div>
+          <div class="value" id="protocol">Loading...</div>
+        </div>
+        <div class="request-detail">
+          <div class="label">Requesting site:</div>
+          <div class="value" id="returnUrl">Loading...</div>
+        </div>
+        <div class="request-detail" id="profilesDetail" style="display:none">
+          <div class="label">Requested profiles:</div>
+          <div class="value" id="profiles">None</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>📋 Insurance Coverage</h3>
+        <div class="card-preview">
+          <h4>Aetna PPO Plan</h4>
+          <div class="card-info">
+            <div><strong>Member:</strong> Jane Doe</div>
+            <div><strong>Member ID:</strong> W123456789</div>
+            <div><strong>Group:</strong> TECH-2024</div>
+            <div><strong>Effective:</strong> 2024-01-01</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>🏥 Health Records to Share</h3>
+        <div class="note">Select which categories from your health record to include</div>
+        <div class="checkbox-group">
+          <label><input type="checkbox" id="allergies" checked> Allergies</label>
+          <label><input type="checkbox" id="medications" checked> Medications</label>
+          <label><input type="checkbox" id="conditions" checked> Conditions</label>
+          <label><input type="checkbox" id="procedures" checked> Procedures</label>
+          <label><input type="checkbox" id="immunizations" checked> Immunizations</label>
+          <label><input type="checkbox" id="labs" checked> Lab Results</label>
+          <label><input type="checkbox" id="vitals" checked> Vital Signs</label>
+          <label><input type="checkbox" id="encounters" checked> Encounters</label>
+          <label><input type="checkbox" id="careplans"> Care Plans</label>
+          <label><input type="checkbox" id="documents"> Clinical Notes</label>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-secondary" onclick="handleCancel()">Cancel</button>
+        <button class="btn-primary" onclick="handleShare()">Share Selected Data</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (() => {
+    const te = new TextEncoder();
+    const td = new TextDecoder();
+    const b64u = (buf) => {
+      const bin = String.fromCharCode(...new Uint8Array(buf));
+      return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    };
+
+    const ub64 = (s) => {
+      const pad = s.length % 4 ? '='.repeat(4 - (s.length % 4)) : '';
+      const b64 = s.replace(/-/g, '+').replace(/_/g, '/') + pad;
+      const bin = atob(b64);
+      const a = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i);
+      return a.buffer;
+    };
+
+    const decJ = (s) => JSON.parse(td.decode(ub64(s)));
+
+    // Parse Navigator Credentials request from hash
+    const params = new URLSearchParams(location.hash.slice(1));
+    const reqB64 = params.get('req');
+
+    if (!reqB64) {
+      document.getElementById('content').innerHTML = '<div style="text-align:center;color:#dc2626;padding:40px">Invalid request parameters</div>';
+      return;
+    }
+
+    let req;
+    try {
+      req = decJ(reqB64); // { v, state, returnUrl, digital: { requests: [...] } }
+    } catch (e) {
+      document.getElementById('content').innerHTML = '<div style="text-align:center;color:#dc2626;padding:40px">Invalid request format</div>';
+      return;
+    }
+
+    const state = req.state;
+    const returnUrl = req.returnUrl;
+    const protocol = req.digital?.requests?.[0]?.protocol || 'Not specified';
+    const requestedData = req.digital?.requests?.[0]?.data || {};
+
+    if (!state || !returnUrl) {
+      document.getElementById('content').innerHTML = '<div style="text-align:center;color:#dc2626;padding:40px">Invalid request parameters</div>';
+      return;
+    }
+
+    document.getElementById('protocol').textContent = protocol;
+    document.getElementById('returnUrl').textContent = returnUrl;
+
+    // Parse and display requested FHIR profiles
+    if (Object.keys(requestedData).length > 0) {
+      const profiles = Object.keys(requestedData).map(key => {
+        const profile = requestedData[key]._profile;
+        return profile ? profile.split('/').pop() : key;
+      }).join(', ');
+      document.getElementById('profiles').textContent = profiles;
+      document.getElementById('profilesDetail').style.display = 'block';
+    }
+
+    console.log('[Flexpa] Request:', { protocol, state, returnUrl, requestedData });
+
+    window.handleCancel = () => {
+      window.close();
+    };
+
+    window.handleShare = () => {
+      // Get selected categories
+      const selected = {
+        allergies: document.getElementById('allergies').checked,
+        medications: document.getElementById('medications').checked,
+        conditions: document.getElementById('conditions').checked,
+        procedures: document.getElementById('procedures').checked,
+        immunizations: document.getElementById('immunizations').checked,
+        labs: document.getElementById('labs').checked,
+        vitals: document.getElementById('vitals').checked,
+        encounters: document.getElementById('encounters').checked,
+        careplans: document.getElementById('careplans').checked,
+        documents: document.getElementById('documents').checked
+      };
+
+      console.log('[Flexpa] Sharing categories:', selected);
+
+      // Build FHIR Bundle with selected categories
+      const entries = [
+        {
+          fullUrl: 'urn:uuid:coverage-1',
+          resource: {
+            resourceType: 'Coverage',
+            id: 'coverage-1',
+            status: 'active',
+            subscriberId: 'W123456789',
+            beneficiary: { display: 'Jane Doe' },
+            payor: [{ display: 'Aetna' }]
+          }
+        }
+      ];
+
+      if (selected.allergies) {
+        entries.push({
+          fullUrl: 'urn:uuid:allergy-1',
+          resource: { resourceType: 'AllergyIntolerance', id: 'allergy-1', code: { text: 'Penicillin' } }
+        });
+      }
+
+      if (selected.medications) {
+        entries.push({
+          fullUrl: 'urn:uuid:med-1',
+          resource: { resourceType: 'MedicationStatement', id: 'med-1', medicationCodeableConcept: { text: 'Lisinopril 10mg' } }
+        });
+      }
+
+      if (selected.conditions) {
+        entries.push({
+          fullUrl: 'urn:uuid:condition-1',
+          resource: { resourceType: 'Condition', id: 'condition-1', code: { text: 'Essential Hypertension' } }
+        });
+      }
+
+      const payload = {
+        v: 1,
+        items: [
+          {
+            contentType: 'application/fhir+json;fhirVersion=4.0.1',
+            label: `Health Summary (${Object.values(selected).filter(Boolean).length} categories)`,
+            body: {
+              resourceType: 'Bundle',
+              type: 'collection',
+              entry: entries
+            }
+          },
+          {
+            contentType: 'application/smart-health-card',
+            label: 'Insurance Card',
+            body: {
+              verifiableCredential: ['eyJ6aXAiOiJERUYiLCJhbGciOiJFUzI1NiIsImtpZCI6IjNLZmRnLVh3UC03Z0g1OS1xdWQtYjU0S18zNGRfOHlvLWY0Zy1reUQifQ.flexpa-insurance.sig']
+            }
+          }
+        ]
+      };
+
+      const result = { v: 1, state, payload };
+      const shlB64 = b64u(te.encode(JSON.stringify(result)));
+      const returnURL = new URL(returnUrl);
+      returnURL.hash = 'shl=' + shlB64;
+
+      console.log('[Flexpa] Returning to:', returnURL.toString());
+      location.href = returnURL.toString();
+    };
+  })();
+  </script>
+</body>
+</html>
