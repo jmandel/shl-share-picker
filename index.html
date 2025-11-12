@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Zero-Trust Web Rails Demo</title>
+  <title>SHL Share Picker Demo</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
     * { box-sizing: border-box; }
@@ -122,14 +122,14 @@
 </head>
 <body>
   <div class="container">
-    <h1>🔐 Zero-Trust Web Rails</h1>
-    <div class="subtitle">Secure health credential sharing with Navigator Credentials API</div>
+    <h1>🔐 SHL Share Picker</h1>
+    <div class="subtitle">Secure credential sharing where the app picker never sees your data</div>
 
     <div class="card">
       <div class="mode-badge" id="mode-badge">Loading...</div>
       <h2>Try the Demo</h2>
       <p>
-        This demonstrates a secure credential sharing flow where a gateway helps users select their
+        This demonstrates a secure credential sharing flow where an app picker helps users select their
         health data source, but never sees the actual data being shared. All sensitive information
         travels directly from the source to the requester.
       </p>
@@ -145,10 +145,17 @@
       <h2>Key Features</h2>
       <ul class="feature-list">
         <li>
+          <span class="feature-icon">🔧</span>
+          <div>
+            <strong>Flexible Hosting</strong><br>
+            Requester chooses the app picker - self-hosted or public
+          </div>
+        </li>
+        <li>
           <span class="feature-icon">🔒</span>
           <div>
-            <strong>Zero-Trust Architecture</strong><br>
-            Gateway never sees response data - true zero-knowledge mediation
+            <strong>Secure Architecture</strong><br>
+            App picker never sees response data - all sensitive information travels directly
           </div>
         </li>
         <li>
@@ -162,7 +169,7 @@
           <span class="feature-icon">📱</span>
           <div>
             <strong>Navigator Credentials Compatible</strong><br>
-            Follows <span class="code">navigator.credentials.get()</span> API pattern
+            Follows <span class="code">navigator.credentials.get()</span> API pattern with <span class="code">digital</span> credential type
           </div>
         </li>
         <li>
@@ -175,15 +182,29 @@
         <li>
           <span class="feature-icon">🔐</span>
           <div>
-            <strong>Hash-Only Transport</strong><br>
-            All sensitive data in hash fragments (never in query params or URLs)
+            <strong>Hash-Based Transport</strong><br>
+            Sensitive data never in query params - only in hash fragments (never logged)
           </div>
         </li>
         <li>
           <span class="feature-icon">🏥</span>
           <div>
             <strong>Health Data Standards</strong><br>
-            Supports FHIR, SMART Health Cards, US Core profiles
+            Supports FHIR profiles, SMART Health Cards and Links, US Core
+          </div>
+        </li>
+        <li>
+          <span class="feature-icon">📝</span>
+          <div>
+            <strong>Questionnaire Support</strong><br>
+            Request and receive FHIR Questionnaire responses inline or by URL
+          </div>
+        </li>
+        <li>
+          <span class="feature-icon">🎯</span>
+          <div>
+            <strong>Request Traceability</strong><br>
+            Each request item has unique ID; responses map back via <span class="code">requestIds</span>
           </div>
         </li>
       </ul>
@@ -193,11 +214,11 @@
       <h2>How It Works</h2>
       <p>
         <strong>1.</strong> Requester initiates credential request using Navigator Credentials API format<br>
-        <strong>2.</strong> Gateway opens showing available health data sources<br>
+        <strong>2.</strong> App picker opens showing available health data sources<br>
         <strong>3.</strong> User selects their preferred source (Flexpa, b.well, or Premera)<br>
         <strong>4.</strong> Source opens, user reviews request and authorizes<br>
         <strong>5.</strong> Data returns directly to requester via BroadcastChannel<br>
-        <strong>6.</strong> Gateway never sees the response - zero-trust achieved
+        <strong>6.</strong> App picker never sees the response - secure architecture
       </p>
     </div>
 
