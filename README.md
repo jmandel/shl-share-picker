@@ -356,6 +356,45 @@ const result = await navigator.credentials.get({
    - SMART Health Links for shareable ongoing access
 5. Navigate to `{returnUrl}/#res={base64url(response_envelope)}`
 
+### For Native Mobile Apps
+
+**Important:** URL fragments (`#req=...`, `#res=...`) are **not uniformly included** in iOS Universal Links or Android App Links. The fragment remains in the browser and never reaches the native app.
+
+**Recommended approach:** Expose a web endpoint that receives the fragment and bridges to your native app.
+
+For example, configure your app picker or requester to use:
+```
+https://shl-endpoint.app.example.org/#req=...
+```
+
+This web page should:
+1. **Read the fragment** - Use JavaScript to access `location.hash`
+2. **Detect if native app is installed** - Attempt to open a custom URL scheme or use other detection methods
+3. **Bridge to native app** - Redirect using custom URL scheme (e.g., `myapp://shl?req=...`) with the request data
+4. **Provide fallback UX** - If app isn't installed, show installation instructions or offer a web-based flow
+5. **Maintain privacy** - The fragment is never sent to your server, only processed client-side
+
+Example web page flow:
+```javascript
+// At https://shl-endpoint.app.example.org/
+const fragment = location.hash.slice(1);  // Get #req=... or #res=...
+
+if (fragment.startsWith('req=')) {
+  const reqData = fragment.substring(4);
+
+  // Try to open native app
+  const customScheme = `myapp://shl?${fragment}`;
+  window.location.href = customScheme;
+
+  // After delay, show "Install app" message if still on page
+  setTimeout(() => {
+    showInstallPrompt();
+  }, 1000);
+}
+```
+
+This approach preserves the security model (fragments never logged) while enabling native app integration.
+
 ### For App Picker Operators
 
 1. Parse the `#req=` hash parameter from the URL
