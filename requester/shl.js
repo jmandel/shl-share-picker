@@ -1,5 +1,5 @@
 /**
- * Zero-Trust Web Rails (ZTWR) - Client Library
+ * SHL Share Picker - Client Library
  * A minimalist, static, cross-platform flow for secure credential sharing
  */
 (() => {
@@ -28,47 +28,6 @@
     .map(b => b.toString(16).padStart(2, '0'))
     .join('');
 
-  // OPTIONAL E2E encryption functions (commented for minimal version)
-  /*
-  async function genECDH() {
-    const kp = await crypto.subtle.generateKey(
-      { name: 'ECDH', namedCurve: 'P-256' },
-      true,
-      ['deriveKey']
-    );
-    const jwk = await crypto.subtle.exportKey('jwk', kp.publicKey);
-    return {
-      kp,
-      pub: { kty: 'EC', crv: 'P-256', x: jwk.x, y: jwk.y }
-    };
-  }
-
-  async function decryptJWE(jwe, privKey, state) {
-    const epk = await crypto.subtle.importKey(
-      'jwk',
-      jwe.epk,
-      { name: 'ECDH', namedCurve: 'P-256' },
-      false,
-      []
-    );
-    const aes = await crypto.subtle.deriveKey(
-      { name: 'ECDH', public: epk },
-      privKey,
-      { name: 'AES-GCM', length: 256 },
-      false,
-      ['decrypt']
-    );
-    const iv = new Uint8Array(ub64(jwe.iv));
-    const aad = te.encode(state);
-    const pt = await crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv, additionalData: aad },
-      aes,
-      ub64(jwe.ciphertext)
-    );
-    return td.decode(pt);
-  }
-  */
-
   /**
    * Initiate a credential request (Navigator Credentials API compatible)
    * @param {Object} credentialRequest - { digital: { requests: [{ protocol, data }] } }
@@ -91,18 +50,15 @@
 
     console.log('[SHL] Initiating request:', { credentialRequest, state, returnUrl });
 
-    // OPTIONAL E2E (commented to keep minimal)
-    // const { kp, pub } = await genECDH();
-
     // Prepare listeners BEFORE opening popup
     const chan = new BroadcastChannel('shl-' + state);
     let pop;
 
     const done = new Promise((resolve, reject) => {
-      const timeout = 5 * 60 * 1000; // 5 minutes
+      const timeout = 2 * 60 * 1000; // 2 minutes
       const to = setTimeout(() => {
         cleanup();
-        reject(new Error('Request timeout after 5 minutes'));
+        reject(new Error('Request timeout after 2 minutes'));
       }, timeout);
 
       chan.onmessage = async (ev) => {
@@ -118,12 +74,7 @@
             return;
           }
 
-          // If E2E encryption enabled:
-          // const plaintext = ret.jwe
-          //   ? await decryptJWE(ret.jwe, kp.privateKey, state)
-          //   : JSON.stringify(ret.payload);
-
-          const plaintext = JSON.stringify(ret.payload); // minimal (no E2E)
+          const plaintext = JSON.stringify(ret.payload);
 
           console.log('[SHL] Request successful!');
           cleanup();
@@ -144,7 +95,7 @@
         chan.close();
         try {
           if (pop && !pop.closed) {
-            console.log('[SHL] Closing gateway popup');
+            console.log('[SHL] Closing app picker popup');
             pop.close();
           }
         } catch (e) {
@@ -153,17 +104,16 @@
       }
     });
 
-    // Open top-level gateway - pass through the digital credential request structure
+    // Open app picker - pass through the digital credential request structure
     const reqEnvelope = encJ({
       v: 1,
       state,
       returnUrl,
       digital: credentialRequest.digital
-      // recip_pub: pub  // if E2E enabled
     });
 
     const url = `${gatewayBase}/#req=${encodeURIComponent(reqEnvelope)}`;
-    console.log('[SHL] Opening gateway:', url);
+    console.log('[SHL] Opening app picker:', url);
 
     pop = window.open(url, '_blank');
     if (!pop) {
@@ -184,13 +134,13 @@
     if (!h) return false;
 
     const p = new URLSearchParams(h);
-    const res = p.get('res'); // base64url(JSON) blob
+    const res = p.get('res');
     if (!res) return false;
 
     console.log('[SHL] Detected return context');
 
     try {
-      const ret = decJ(res); // { v, state, payload | jwe }
+      const ret = decJ(res);
       if (!ret?.state) {
         console.warn('[SHL] Return data missing state');
         return false;

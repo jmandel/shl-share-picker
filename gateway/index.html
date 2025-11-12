@@ -190,7 +190,7 @@
 
     let req;
     try {
-      req = decJ(reqB64); // { v, state, returnUrl, digital: { requests: [...] }, recip_pub? }
+      req = decJ(reqB64); // { v, state, returnUrl, digital: { requests: [...] } }
       console.log('[Gateway] Request:', req);
 
       // Show request info - extract protocol from first request
@@ -259,7 +259,6 @@
               state: req.state,
               returnUrl: req.returnUrl,
               digital: req.digital
-              // plus recip_pub if E2E enabled
             };
 
             const handoff = 'req=' + encodeURIComponent(b64u(te.encode(JSON.stringify(handoffEnvelope))));
