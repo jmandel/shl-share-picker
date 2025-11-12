@@ -322,9 +322,9 @@
       };
 
       const result = { v: 1, state, payload };
-      const shlB64 = b64u(te.encode(JSON.stringify(result)));
+      const resB64 = b64u(te.encode(JSON.stringify(result)));
       const returnURL = new URL(returnUrl);
-      returnURL.hash = 'shl=' + shlB64;
+      returnURL.hash = 'res=' + resB64;
 
       console.log('[Premera] Returning to:', returnURL.toString());
       location.href = returnURL.toString();
