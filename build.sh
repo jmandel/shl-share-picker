@@ -5,7 +5,7 @@ set -e
 SHARED_FILES=("shl.js" "config.js")
 
 # Define target directories
-TARGET_DIRS=("requester" "checkin" "source-bwell" "source-flexpa" "source-premera")
+TARGET_DIRS=("requester" "checkin" "source-flexpa")
 
 echo "Building project..."
 
