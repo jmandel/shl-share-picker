@@ -1,285 +1,250 @@
-# SMART Health Check-in Pattern
+# SMART Health Check-in Protocol
 
-A web-standard approach to "Kill the Clipboard" – enabling patients to share health records and insurance data with providers digitally, before they arrive at the clinic.
+This repository defines and demonstrates a **Browser-Based Protocol** for sharing health data using **OID4VP (OpenID for Verifiable Presentations)** and **DCQL (Digital Credentials Query Language)**.
 
-## 🌐 Live Demo
+## 1. SMART Health Check-in Profile of OID4VP
 
-Visit [joshuamandel.com/smart-health-checkin-demo](https://joshuamandel.com/smart-health-checkin-demo) to try the interactive simulation of **Dr. Mandel's Family Medicine** clinic.
+This section defines the **Protocol Profile**, specifying how OID4VP is used to transport the request and response.
 
-## 🎯 The Problem
+### 1.1 Authorization Request
 
-The CMS Interoperability Framework aims to "Kill the Clipboard" by 2026, but current remote workflows force patients into complex manual processes:
+The Authorization Request MUST follow the requirements of OpenID for Verifiable Presentations 1.0.
 
-- **File System**: Providers ask patients to "Upload your Health Card," assuming patients know how to export files from their health apps
-- **Copy-Paste**: Patients must switch contexts repeatedly to generate and paste sharing links
-- **"Self-Scan"**: Patients on mobile phones cannot scan QR codes displayed on their own screens
+**Parameters:**
 
-These barriers prevent widespread adoption of existing standards like SMART Health Cards (SHC) and SMART Health Links (SHL), which work beautifully for in-person interactions.
+*   `response_type`: MUST be `vp_token`.
+*   `response_mode`: MUST be `fragment` (for browser-based flows).
+*   `client_id`: MUST use the `redirect_uri` Client Identifier Prefix.
+    *   Format: `redirect_uri:<Redirect_URI>`
+    *   Example: `redirect_uri:https://clinic.example.com/callback`
+*   `nonce`: REQUIRED.
+*   `state`: REQUIRED.
+*   `dcql_query`: REQUIRED. A JSON-encoded DCQL query object (defined in Section 2).
 
-## 💡 The Proposal
-
-The **SMART Health Check-in Pattern** is a pragmatic bridge inspired by the [W3C Digital Credentials API](https://wicg.github.io/digital-credentials/). It mimics the request/response structure of `navigator.credentials.get()` but implements the flow using standard web redirects and messaging, ensuring reliability on all current devices.
-
-### Key Principles
-
-1. **Pass-Through Security**: The picker component routes requests but never sees response data
-2. **W3C Alignment**: Uses the same data structures as the emerging Digital Credentials API
-3. **Rich Interactions**: Enables form pre-filling, granular consent, and annotations
-4. **Zero Infrastructure**: Works on static hosting (CDN, GitHub Pages) with no server-side state
-
-## 🏗️ Architecture
-
-The pattern involves three components:
-
+**Example Request:**
 ```
-┌──────────────┐         ┌─────────────────┐         ┌──────────────┐
-│   Provider   │────1───>│  Check-in       │────3───>│  Patient's   │
-│   Portal     │         │  Component      │         │  Health App  │
-│ (Requester)  │<───5────┤  (Router)       │         │  (Source)    │
-└──────────────┘         └─────────────────┘         └──────┬───────┘
-                                                             │
-                         Response bypasses ──────────────────┘
-                         the picker entirely
-```
-
-### Workflow
-
-1. **Request**: Provider constructs JSON defining needed data (insurance card, clinical history, questionnaires)
-2. **Picker**: User selects their health data source from a directory
-3. **Authorization**: Patient app renders consent UI with:
-   - Pre-filled forms using patient's existing data
-   - Granular selection (e.g., "share immunizations but not mental health notes")
-   - Ability to add annotations
-4. **Return**: Data flows directly from patient app to provider via `BroadcastChannel`
-
-The picker **never sees response data** – it closes immediately after routing the request.
-
-## ✨ Features
-
-### For Patients
-- **Familiar UX**: "Sign in with..." style flow users already trust
-- **Reduced Burden**: Forms pre-filled with known data (name, DOB, medications, allergies)
-- **Control**: Granular consent over what to share
-
-### For Providers
-- **Automated Processing**: Request IDs map responses to specific needs
-- **Multiple Formats**: Supports SMART Health Cards, FHIR Bundles, and Questionnaire Responses
-- **Traceability**: Transparent transaction logs for verification
-
-### For Developers
-- **Static Hosting**: No backend required – works on GitHub Pages, Netlify, etc.
-- **Future-Proof**: Data structures align with W3C Digital Credentials API
-- **Flexible**: Picker can be self-hosted or use a public instance
-
-## 🚀 Quick Start
-
-### GitHub Pages (Single-Origin)
-
-The demo is live at: https://joshuamandel.com/smart-health-checkin-demo
-
-All components run under the same origin at different subpaths:
-- Landing page: `/`
-- Requester (Dr. Mandel's Clinic): `/requester/`
-- Check-in picker: `/checkin/`
-- Data sources: `/source-flexpa/`, `/source-bwell/`, `/source-premera/`
-
-### Local Testing (Multi-Origin)
-
-For local development with true cross-origin testing:
-
-```bash
-# Start all servers on different localhost ports
-./start-local.sh
-```
-
-This starts 5 servers:
-- Requester: http://requester.localhost:3000
-- Check-in: http://checkin.localhost:3001
-- Flexpa: http://flexpa.localhost:3002
-- b.well: http://bwell.localhost:3003
-- Premera: http://premera.localhost:3004
-
-Visit http://requester.localhost:3000 to start.
-
-## 📋 Protocol Overview
-
-### Request Format
-
-Uses W3C Digital Credentials structure:
-
-```javascript
-const result = await SHL.request({
-  digital: {
-    requests: [{
-      protocol: 'smart-health-data',
-      data: {
-        items: [
-          {
-            id: 'coverage-1',
-            type: 'fhir-profile',
-            resourceType: 'Coverage',
-            profile: 'http://hl7.org/fhir/us/insurance-card/StructureDefinition/C4DIC-Coverage'
-          },
-          {
-            id: 'intake-1',
-            type: 'fhir-questionnaire',
-            questionnaire: { /* FHIR Questionnaire */ }
-          }
-        ]
-      }
-    }]
-  }
-}, {
-  checkinBase: 'https://checkin.example.org'
-});
-```
-
-### Response Format
-
-The patient app returns a response envelope in the URL hash:
-
-```javascript
-// Response envelope (source app → requester)
-{
-  v: 1,
-  state: "matches-request-state",  // Must match the request state
-  payload: {
-    items: [
+https://wallet.example.com/authorize?
+  client_id=redirect_uri:https://clinic.example.com/callback&
+  response_type=vp_token&
+  response_mode=fragment&
+  state=...&
+  nonce=...&
+  dcql_query={
+    "credentials": [
       {
-        requestIds: ["coverage-1"],      // Maps back to request item IDs
-        type: "fhir-resource",
-        contentType: "application/smart-health-card",
-        label: "Digital Insurance Card",
-        body: { /* Verifiable Credential */ }
-      },
-      {
-        requestIds: ["intake-1"],
-        type: "fhir-questionnaire-response",
-        contentType: "application/fhir+json",
-        label: "Patient Intake Form",
-        body: { /* QuestionnaireResponse */ }
+        "id": "req_1",
+        "format": "smart_artifact",
+        "meta": { "profile": "..." }
       }
     ]
   }
-}
 ```
 
-### Protocol Flow Details
+### 1.2 Authorization Response
 
-1. **Source app** returns the response by navigating to:
-   ```
-   {returnUrl}#res={base64url(responseEnvelope)}
-   ```
+The response is returned to the `redirect_uri` in the URL fragment.
 
-2. **Return tab** detects `#res=` in hash, decodes it, and broadcasts via `BroadcastChannel('shl-{state}')`
+**Parameters:**
 
-3. **Original requester tab** receives the broadcast, validates state, and extracts the payload
-
-4. **SHL.request() resolves** with:
-   ```javascript
-   {
-     type: 'digital_credential',
-     protocol: 'smart-health-data',
-     data: JSON.stringify(payload)  // The payload stringified
-   }
-   ```
-
-## 🔒 Security Model
-
-### Hash-Based Transport
-All sensitive data travels in URL hash fragments (`#req=...`, `#res=...`):
-- **Never sent to servers** - Not in HTTP requests
-- **Never logged** - Not visible in logs or proxies
-- **Never leaked** - Not in Referer headers
-
-### Pass-Through Architecture
-- Request flow: Requester → Check-in → Patient App
-- Response flow: Patient App → Requester (**bypassing check-in**)
-- Check-in component closes immediately after routing
-
-### State Validation
-- Random 128-bit state parameter
-- Must match between request and response
-- Prevents replay attacks
-
-### BroadcastChannel Security
-- Messages only reach same-origin pages
-- State parameter provides additional validation
-- No server-side state required
-
-## 🧪 Using the Library
-
-```javascript
-// Include the library
-<script src="./shl.js"></script>
-
-// Make a request
-const result = await SHL.request({
-  digital: {
-    requests: [{
-      protocol: 'smart-health-data',
-      data: {
-        items: [
-          {
-            id: 'patient-1',
-            type: 'fhir-profile',
-            resourceType: 'Patient',
-            profile: 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient'
-          }
-        ]
-      }
-    }]
-  }
-}, {
-  checkinBase: 'https://joshuamandel.com/smart-health-checkin-demo/checkin',
-  clientName: 'Your Clinic Name'
-});
-
-// Handle the return
-await SHL.maybeHandleReturn();
-```
-
-## 📦 Project Structure
-
-```
-smart-health-checkin-demo/
-├── index.html              # Landing page / explainer
-├── config.js              # Environment-aware configuration
-├── shl.js                 # Core library
-├── requester/             # Dr. Mandel's Family Medicine demo
-│   ├── index.html
-│   ├── config.js
-│   └── shl.js
-├── checkin/               # Check-in picker component
-│   ├── index.html
-│   └── config.js
-├── source-flexpa/         # Flexpa data source demo
-│   └── index.html
-├── source-bwell/          # b.well data source demo
-│   └── index.html
-└── source-premera/        # Premera data source demo
-    └── index.html
-```
-
-## 🎓 Learn More
-
-- [W3C Digital Credentials API](https://wicg.github.io/digital-credentials/)
-- [SMART Health Cards](https://smarthealth.cards/)
-- [SMART Health Links](https://docs.smarthealthit.org/smart-health-links/)
-- [FHIR](https://www.hl7.org/fhir/)
-- [US Core Implementation Guide](http://hl7.org/fhir/us/core/)
-- [CMS Interoperability Framework](https://www.cms.gov/priorities/key-initiatives/burden-reduction/interoperability)
-
-## 📝 License
-
-MIT License - see LICENSE file for details
-
-## 🤝 Contributing
-
-This is a demonstration of a proposed pattern. Feedback and contributions welcome!
-
-Open an issue or pull request at: https://github.com/jmandel/smart-health-checkin-demo
+*   `vp_token`: REQUIRED. The Verifiable Presentation Token (defined in Section 2).
+*   `smart_artifacts`: REQUIRED. The credential data array (defined in Section 2).
+*   `state`: REQUIRED. Must match the request state.
 
 ---
 
-**SMART Health Check-in Pattern** – A pragmatic bridge to W3C Digital Credentials for healthcare
+## 2. DCQL Profile for SMART Health Check-in
+
+This section defines the **Data Profile**, specifying the structure of the DCQL query and the response.
+
+### 2.1 Credential Format: `smart_artifact`
+
+This profile defines a single Credential Format Identifier: **`smart_artifact`**.
+
+The credential query object uses a **standard DCQL structure**. Properties specific to this profile are specified within the `meta` object:
+
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| `id` | String | **Required.** Unique ID for this request item. |
+| `format` | String | **Required.** Must be `"smart_artifact"`. |
+| `optional` | Boolean | **Required.** Must be `true` for this profile. Indicates that users may decline to share this credential, and partial responses are valid. |
+| `meta` | Object | **Required.** Container for profile-specific constraints. |
+| `meta.profile` | String | **Optional.** Canonical URL of a FHIR StructureDefinition (e.g., for Patient, Coverage). |
+| `meta.questionnaire` | Object | **Optional.** Full FHIR Questionnaire JSON to be rendered/completed by the user. |
+| `meta.questionnaireUrl` | String | **Optional.** Alternative to `questionnaire`: URL reference to a Questionnaire resource. |
+| `meta.signing_strategy` | Array | **Optional.** Array of acceptable signing strategies: `["none"]` (default), `["shc_v1"]`, `["shc_v2"]`, or multiple like `["shc_v1", "shc_v2"]`. |
+| `require_cryptographic_holder_binding` | Boolean | **Required.** Must be `false` for this profile. |
+
+#### Examples
+
+**Requesting Insurance (Raw Data):**
+```json
+{
+  "credentials": [
+    {
+      "id": "req_insurance",
+      "format": "smart_artifact",
+      "optional": true,
+      "require_cryptographic_holder_binding": false,
+      "meta": {
+        "profile": "http://hl7.org/fhir/us/insurance-card/StructureDefinition/C4DIC-Coverage"
+      }
+    }
+  ]
+}
+```
+
+**Requesting a Form (User Input):**
+```json
+{
+  "credentials": [
+    {
+      "id": "req_intake",
+      "format": "smart_artifact",
+      "optional": true,
+      "require_cryptographic_holder_binding": false,
+      "meta": {
+        "questionnaire": {
+          "resourceType": "Questionnaire",
+          "status": "active",
+          "item": [{ "linkId": "1", "text": "Allergies?", "type": "string" }]
+        }
+      }
+    }
+  ]
+}
+```
+
+**Requesting a Signed Immunization Record (SHC):**
+```json
+{
+  "credentials": [
+    {
+      "id": "req_immunization",
+      "format": "smart_artifact",
+      "optional": true,
+      "require_cryptographic_holder_binding": false,
+      "meta": {
+        "profile": "http://hl7.org/fhir/StructureDefinition/Immunization",
+        "signing_strategy": ["shc_v1", "shc_v2"]
+      }
+    }
+  ]
+}
+```
+
+### 2.2 Response Structure
+
+To comply with OID4VP structure requirements (Section 6.1) while minimizing payload size, this profile uses a split-payload pattern with **typed wrappers**.
+
+The Authorization Response MUST include two parameters in the URL fragment:
+
+#### `vp_token` (The Mapping)
+
+REQUIRED. A JSON Object where keys correspond to the `id`s defined in the `dcql_query` of the request.
+
+*   **Keys:** The DCQL Request ID string.
+*   **Values:** An Array of **Integers**. Each integer is a zero-based index referencing an item in the `smart_artifacts` array.
+
+#### `smart_artifacts` (The Data)
+
+REQUIRED. A JSON Array containing **typed credential wrappers**.
+
+Each wrapper is a JSON Object with:
+
+| Property | Description |
+|----------|-------------|
+| `type`   | REQUIRED. String. The type of credential data (e.g., `"fhir_resource"`, `"shc"`, `"shl"`). |
+| `data`   | REQUIRED. The actual credential payload. Format depends on `type`. (Object for resources, String for links/cards). |
+
+**Example Response:**
+
+Scenario: Insurance request (Index 0) returned as JSON, History request (Index 1) returned as SHL.
+
+```json
+{
+  "vp_token": {
+    "req_insurance": [0],
+    "req_history": [1]
+  },
+  "smart_artifacts": [
+    {
+      "type": "fhir_resource",
+      "data": {
+        "resourceType": "Coverage",
+        "id": "cov-123",
+        "status": "active",
+        "payor": [{ "display": "Aetna" }]
+      }
+    },
+    {
+      "type": "smart_health_link",
+      "data": "shlink:/eyJhbGci..."
+    }
+  ]
+}
+```
+
+#### Format-Specific Presentation Definition
+
+For the `smart_artifact` Credential Format, a **Presentation** is defined as a typed wrapper object (as defined above in the `smart_artifacts` array). 
+
+The `vp_token` parameter contains arrays of integer indices that reference these presentations. This indirection pattern:
+- Allows many-to-many mapping between request IDs and response data without duplication
+- Remains compliant with OID4VP's requirement that presentations be represented "as a string or object, depending on the format" (OID4VP Section 7.1)
+- Enables efficient payload encoding when the same credential satisfies multiple requests
+
+**Note:** Client libraries (such as `shl.js`) can rehydrate the response before exposing it to applications by replacing indices with actual data from `smart_artifacts`, unwrapping the typed wrappers in the process.
+
+---
+
+## 3. Browser-Based Implementation (The "Shim")
+
+To enable this protocol in pure browser environments (without backend O ID4VP handlers), this repository provides a reference implementation using a **W3C Digital Credentials API Shim**.
+
+### 3.1 The Shim (`shl.js`)
+
+The `shl.js` library exposes a `SHL.request()` function that mimics the W3C Digital Credentials API but orchestrates the OID4VP flow over standard browser navigation.
+
+```javascript
+// Client Code
+const result = await SHL.request({
+  digital: {
+    requests: [{
+      protocol: 'openid4vp',
+      data: { dcql_query: ... }
+    }]
+  }
+});
+```
+
+### 3.2 Transport Mechanism
+
+1.  **Request**: The shim opens the Health App URL (via a Picker) in a popup window with the OID4VP query parameters.
+2.  **Response**: The Health App redirects the popup to the `redirect_uri` (e.g., `callback.html`) with the response in the URL fragment.
+3.  **Handoff**: The `callback.html` page uses a `BroadcastChannel` to send the `vp_token` and `smart_artifacts` back to the original tab.
+4.  **Completion**: The shim receives the data, closes the popup, rehydrates the response, and resolves the Promise.
+
+## 4. Reference Implementation (Demo)
+
+This repository contains a fully functional reference implementation of the protocol.
+
+### 4.1 Components
+
+*   **Requester (`/requester`)**: A demo "Doctor's Clinic" app that initiates the flow.
+*   **Picker (`/checkin`)**: A simple UI that helps users select their health app.
+*   **Health App (`/source-flexpa`)**: A mock health app implementation that acts as an OID4VP Provider.
+
+### 4.2 Running the Demo
+
+To simulate the cross-origin security model locally:
+
+```bash
+./start-local.sh
+```
+
+This starts 5 servers on different ports (Requester, Check-in, and Health apps).
+Visit **http://requester.localhost:3000** to try the flow.
+
+## 5. License
+
+MIT License

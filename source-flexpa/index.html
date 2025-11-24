@@ -1,11 +1,15 @@
 <!doctype html>
 <html>
+
 <head>
   <meta charset="utf-8" />
   <title>Flexpa - Health Data Access</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: system-ui, -apple-system, sans-serif;
       margin: 0;
@@ -17,6 +21,7 @@
       justify-content: center;
       padding: 20px;
     }
+
     .container {
       max-width: 600px;
       width: 100%;
@@ -26,20 +31,25 @@
       padding: 32px;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     }
+
     .logo {
       display: flex;
       gap: 2px;
       margin-bottom: 16px;
       justify-content: center;
     }
+
     .pixel {
       width: 12px;
       height: 12px;
       background: #0d9488;
     }
-    .pixel:nth-child(4), .pixel:nth-child(5) {
+
+    .pixel:nth-child(4),
+    .pixel:nth-child(5) {
       background: #84cc16;
     }
+
     h1 {
       margin: 0 0 8px 0;
       font-size: 28px;
@@ -47,12 +57,14 @@
       color: #0d9488;
       font-weight: 700;
     }
+
     .subtitle {
       text-align: center;
       color: #64748b;
       font-size: 14px;
       margin-bottom: 24px;
     }
+
     .request-box {
       background: #f1f5f9;
       border: 2px solid #e2e8f0;
@@ -60,6 +72,7 @@
       padding: 16px;
       margin-bottom: 20px;
     }
+
     .request-box h2 {
       margin: 0 0 12px 0;
       font-size: 12px;
@@ -68,19 +81,23 @@
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
+
     .request-detail {
       margin: 6px 0;
       font-size: 13px;
     }
+
     .label {
       color: #64748b;
       font-weight: 500;
     }
+
     .value {
       color: #1e293b;
       font-family: monospace;
       font-size: 12px;
     }
+
     .request-item {
       background: white;
       border: 1px solid #e2e8f0;
@@ -89,26 +106,31 @@
       margin: 8px 0;
       font-size: 12px;
     }
+
     .request-item-type {
       font-weight: 600;
       color: #0d9488;
       margin-bottom: 4px;
     }
+
     .section {
       margin: 20px 0;
     }
+
     .section h3 {
       margin: 0 0 12px 0;
       font-size: 14px;
       font-weight: 600;
       color: #0d9488;
     }
+
     .checkbox-group {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
       margin: 12px 0;
     }
+
     label {
       display: flex;
       align-items: center;
@@ -120,16 +142,20 @@
       color: #334155;
       transition: background 0.15s;
     }
+
     label:hover {
       background: #f1f5f9;
     }
+
     input[type="checkbox"] {
       width: 18px;
       height: 18px;
       accent-color: #0d9488;
       cursor: pointer;
     }
-    input[type="text"], textarea {
+
+    input[type="text"],
+    textarea {
       width: 100%;
       padding: 8px;
       border: 1px solid #cbd5e0;
@@ -137,10 +163,12 @@
       font-family: inherit;
       font-size: 14px;
     }
+
     textarea {
       min-height: 60px;
       resize: vertical;
     }
+
     .card-preview {
       background: white;
       border: 2px solid #0d9488;
@@ -149,20 +177,24 @@
       margin: 12px 0;
       box-shadow: 0 2px 8px rgba(13, 148, 136, 0.1);
     }
+
     .card-preview h4 {
       margin: 0 0 8px 0;
       font-size: 14px;
       color: #0d9488;
       font-weight: 600;
     }
+
     .card-info {
       font-size: 13px;
       line-height: 1.6;
       color: #475569;
     }
+
     .card-info div {
       margin: 4px 0;
     }
+
     .questionnaire-form {
       background: white;
       border: 2px solid #e2e8f0;
@@ -170,15 +202,18 @@
       padding: 16px;
       margin: 12px 0;
     }
+
     .questionnaire-item {
       margin: 16px 0;
     }
+
     .questionnaire-item label {
       display: block;
       font-weight: 600;
       margin-bottom: 6px;
       color: #1e293b;
     }
+
     .auto-filled-banner {
       background: #fef3c7;
       border: 2px solid #fbbf24;
@@ -189,24 +224,29 @@
       align-items: center;
       gap: 12px;
     }
+
     .auto-filled-banner-icon {
       font-size: 24px;
     }
+
     .auto-filled-banner-text {
       flex: 1;
       color: #92400e;
       font-weight: 600;
       font-size: 14px;
     }
+
     .auto-filled-field {
       background: #fef3c7 !important;
       border-color: #fbbf24 !important;
     }
+
     .actions {
       display: flex;
       gap: 12px;
       margin-top: 24px;
     }
+
     button {
       flex: 1;
       padding: 14px 24px;
@@ -217,27 +257,33 @@
       cursor: pointer;
       transition: all 0.2s;
     }
+
     .btn-primary {
       background: #0d9488;
       color: white;
     }
+
     .btn-primary:hover {
       background: #0f766e;
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
     }
+
     .btn-primary:disabled {
       background: #cbd5e0;
       cursor: not-allowed;
       transform: none;
     }
+
     .btn-secondary {
       background: #e2e8f0;
       color: #475569;
     }
+
     .btn-secondary:hover {
       background: #cbd5e0;
     }
+
     .note {
       font-size: 12px;
       color: #64748b;
@@ -248,6 +294,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="logo">
@@ -267,171 +314,321 @@
   </div>
 
   <script>
-  (() => {
-    const te = new TextEncoder();
-    const td = new TextDecoder();
-    const b64u = (buf) => {
-      const bin = String.fromCharCode(...new Uint8Array(buf));
-      return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-    };
+    (() => {
+      const te = new TextEncoder();
+      const td = new TextDecoder();
+      const b64u = (buf) => {
+        const bin = String.fromCharCode(...new Uint8Array(buf));
+        return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+      };
 
-    const ub64 = (s) => {
-      const pad = s.length % 4 ? '='.repeat(4 - (s.length % 4)) : '';
-      const b64 = s.replace(/-/g, '+').replace(/_/g, '/') + pad;
-      const bin = atob(b64);
-      const a = new Uint8Array(bin.length);
-      for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i);
-      return a.buffer;
-    };
+      const ub64 = (s) => {
+        const pad = s.length % 4 ? '='.repeat(4 - (s.length % 4)) : '';
+        const b64 = s.replace(/-/g, '+').replace(/_/g, '/') + pad;
+        const bin = atob(b64);
+        const a = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i);
+        return a.buffer;
+      };
 
-    const decJ = (s) => JSON.parse(td.decode(ub64(s)));
+      const decJ = (s) => JSON.parse(td.decode(ub64(s)));
 
-    // Parse Navigator Credentials request from hash
-    const params = new URLSearchParams(location.hash.slice(1));
-    const reqB64 = params.get('req');
+      // Parse Navigator Credentials request from hash OR query
+      const hashParams = new URLSearchParams(location.hash.slice(1));
+      const queryParams = new URLSearchParams(location.search);
 
-    if (!reqB64) {
-      document.getElementById('content').innerHTML = '<div style="text-align:center;color:#dc2626;padding:40px">Invalid request parameters</div>';
-      return;
-    }
+      // Helper to get param from either source
+      const getParam = (k) => queryParams.get(k) || hashParams.get(k);
 
-    let req;
-    try {
-      req = decJ(reqB64); // { v, state, returnUrl, digital: { requests: [...] } }
-    } catch (e) {
-      document.getElementById('content').innerHTML = '<div style="text-align:center;color:#dc2626;padding:40px">Invalid request format</div>';
-      return;
-    }
+      // Detect OID4VP vs Legacy
+      const isOid4vp = getParam('response_type') === 'vp_token';
 
-    const state = req.state;
-    const returnUrl = req.returnUrl;
-    const protocol = req.digital?.requests?.[0]?.protocol || 'Not specified';
-    const requestItems = req.digital?.requests?.[0]?.data?.items || [];
+      let req = {};
+      let state, returnUrl, protocol, requestItems;
 
-    if (!state || !returnUrl) {
-      document.getElementById('content').innerHTML = '<div style="text-align:center;color:#dc2626;padding:40px">Invalid request parameters</div>';
-      return;
-    }
+      if (isOid4vp) {
+        state = getParam('state');
+        // Extract redirect_uri from client_id (remove 'redirect_uri:' prefix)
+        const clientId = getParam('client_id');
+        if (clientId && clientId.startsWith('redirect_uri:')) {
+          returnUrl = clientId.substring('redirect_uri:'.length);
+        } else {
+          // Fallback or error if malformed
+          returnUrl = getParam('redirect_uri');
+        }
 
-    console.log('[Flexpa] Request:', { protocol, state, returnUrl, requestItems });
+        protocol = 'openid4vp';
+        const dcql = JSON.parse(getParam('dcql_query') || '{}');
+        req = { dcql_query: dcql };
 
-    // Render UI based on request items
-    let html = `
-      <div class="request-box">
-        <h2>Share Request</h2>
-        <div class="request-detail">
-          <div class="label">Protocol:</div>
-          <div class="value">${protocol}</div>
-        </div>
-        <div class="request-detail">
-          <div class="label">Requesting site:</div>
-          <div class="value">${returnUrl}</div>
-        </div>
-        <div class="request-detail">
-          <div class="label">Requested items (${requestItems.length}):</div>
-          ${requestItems.map(item => `
-            <div class="request-item">
-              <div class="request-item-type">${item.type === 'fhir-profile' ? '📋 Profile' : '📝 Questionnaire'}: ${item.id}</div>
-              <div class="value">${item.profile || item.questionnaireUrl || 'Inline questionnaire'}</div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    `;
 
-    // Show selection checkboxes for what was requested
-    html += `<div class="section"><h3>Select Data to Share</h3><div class="note">Choose which requested items to share with the provider</div>`;
+        console.log('[Flexpa] DCQL Credentials:', JSON.stringify(dcql.credentials, null, 2));
+        requestItems = (dcql.credentials || []).map((c, idx) => {
+          const meta = c.meta || {};
+          const profile = meta.profile || c.profile;
+          const questionnaire = meta.questionnaire || c.questionnaire;
+          const questionnaireUrl = meta.questionnaireUrl || c.questionnaireUrl;
 
-    // Check for insurance/coverage requests
-    const hasCoverageRequest = requestItems.some(item =>
-      item.type === 'fhir-profile' && item.resourceType === 'Coverage'
-    );
-    if (hasCoverageRequest) {
-      html += `
-        <label style="display:flex;align-items:flex-start;gap:12px;padding:16px;background:white;border:2px solid #e2e8f0;border-radius:8px;margin:12px 0;cursor:pointer;">
-          <input type="checkbox" id="share-insurance" checked style="margin-top:4px">
-          <div style="flex:1">
-            <div style="font-weight:600;color:#0d9488;margin-bottom:8px">📋 Insurance Card</div>
-            <div class="card-preview" style="margin:0">
-              <div class="card-info">
-                <div><strong>Member:</strong> Jane Doe</div>
-                <div><strong>Member ID:</strong> W123456789</div>
-                <div><strong>Plan:</strong> Aetna PPO</div>
-              </div>
-            </div>
-          </div>
-        </label>
-      `;
-    }
+          const isQuestionnaire = !!questionnaire || !!questionnaireUrl;
+          console.log(`[Flexpa] Credential ${idx}:`, {
+            id: c.id,
+            format: c.format,
+            profile: profile,
+            hasQuestionnaire: isQuestionnaire
+          });
+          return {
+            type: isQuestionnaire ? 'fhir-questionnaire' : 'fhir-profile',
+            id: c.id,
+            profile: profile,
+            questionnaire: questionnaire,
+            questionnaireUrl: questionnaireUrl
+          };
+        });
+        console.log('[Flexpa] Mapped RequestItems:', requestItems);
+        console.log('[Flexpa] Questionnaire items:', requestItems.filter(i => i.type === 'fhir-questionnaire'));
+      } else {
+        const reqB64 = hashParams.get('req');
 
-    // Check for clinical/patient requests
-    const hasClinicalRequest = requestItems.some(item =>
-      item.type === 'fhir-profile' && item.resourceType === 'Patient'
-    );
-    if (hasClinicalRequest) {
-      html += `
-        <label style="display:flex;align-items:flex-start;gap:12px;padding:16px;background:white;border:2px solid #e2e8f0;border-radius:8px;margin:12px 0;cursor:pointer;">
-          <input type="checkbox" id="share-clinical" checked style="margin-top:4px">
-          <div style="flex:1">
-            <div style="font-weight:600;color:#0d9488;margin-bottom:8px">🏥 Clinical Summary</div>
-            <div style="font-size:13px;color:#64748b">Health records including medications, allergies, conditions, and vital signs</div>
-          </div>
-        </label>
-      `;
-    }
+        if (!reqB64) {
+          document.getElementById('content').textContent = 'Invalid request parameters';
+          document.getElementById('content').style.cssText = 'text-align:center;color:#dc2626;padding:40px';
+          return;
+        }
 
-    html += `</div>`;
+        try {
+          req = decJ(reqB64); // { v, state, returnUrl, digital: { requests: [...] } }
+        } catch (e) {
+          document.getElementById('content').textContent = 'Invalid request format';
+          document.getElementById('content').style.cssText = 'text-align:center;color:#dc2626;padding:40px';
+          return;
+        }
 
-    // Check for questionnaire requests
-    const questionnaireItems = requestItems.filter(item => item.type === 'fhir-questionnaire');
-    if (questionnaireItems.length > 0) {
-      html += `<div class="section">`;
-      questionnaireItems.forEach((qItem, idx) => {
-        const questionnaire = qItem.questionnaire;
-        const title = questionnaire?.title || qItem.id;
+        state = req.state;
+        returnUrl = req.returnUrl;
+        protocol = req.digital?.requests?.[0]?.protocol || 'Not specified';
+        requestItems = req.digital?.requests?.[0]?.data?.items || [];
+      }
 
-        // Generate random pre-filled values
-        const randomNames = ['Jane Doe', 'John Smith', 'Maria Garcia', 'James Johnson'];
-        const randomDates = ['1985-06-15', '1990-03-22', '1978-11-30', '1995-08-14'];
-        const randomConcerns = [
-          'Occasional headaches and fatigue',
-          'Managing blood pressure',
-          'Seasonal allergies',
-          'No specific concerns at this time'
-        ];
-        const randomMeds = [
-          'Lisinopril 10mg daily for blood pressure',
-          'Metformin 500mg twice daily',
-          'Levothyroxine 50mcg daily',
-          'No current medications'
-        ];
-        const randomAllergies = ['Penicillin', 'Shellfish', 'Pollen', 'None known'];
+      if (!state || !returnUrl) {
+        document.getElementById('content').innerHTML = '<div style="text-align:center;color:#dc2626;padding:40px">Invalid request parameters</div>';
+        return;
+      }
 
-        const randomIdx = Math.floor(Math.random() * 4);
+      console.log('[Flexpa] Request:', { protocol, state, returnUrl, requestItems });
 
-        html += `
-          <label style="display:flex;align-items:flex-start;gap:12px;padding:16px;background:white;border:2px solid #e2e8f0;border-radius:8px;margin:12px 0;cursor:pointer;">
-            <input type="checkbox" id="share-questionnaire-${idx}" data-q-idx="${idx}" checked style="margin-top:4px">
-            <div style="flex:1">
-              <div style="font-weight:600;color:#0d9488;margin-bottom:8px">📝 ${title}</div>
-              <div class="auto-filled-banner" style="margin:12px 0">
-                <div class="auto-filled-banner-icon">✓</div>
-                <div class="auto-filled-banner-text">We found matching records. We have auto-filled your Intake Form below using data from your health records.</div>
-              </div>
-              <div class="questionnaire-form" id="q-form-${idx}">
-        `;
+      // Render UI based on request items
 
-        // Render each question based on the questionnaire structure
-        if (questionnaire && questionnaire.item) {
-          questionnaire.item.forEach((question, qIdx) => {
+      const contentEl = document.getElementById('content');
+      contentEl.textContent = ''; // Clear existing
+
+      // Render Request Box
+      const requestBox = document.createElement('div');
+      requestBox.className = 'request-box';
+
+      const h2 = document.createElement('h2');
+      h2.textContent = 'Share Request';
+      requestBox.appendChild(h2);
+
+      const addDetail = (label, value) => {
+        const div = document.createElement('div');
+        div.className = 'request-detail';
+        const l = document.createElement('div');
+        l.className = 'label';
+        l.textContent = label;
+        const v = document.createElement('div');
+        v.className = 'value';
+        v.textContent = value;
+        div.appendChild(l);
+        div.appendChild(v);
+        requestBox.appendChild(div);
+      };
+
+      addDetail('Protocol:', protocol);
+      addDetail('Requesting site:', returnUrl);
+
+      const itemsDetail = document.createElement('div');
+      itemsDetail.className = 'request-detail';
+      const itemsLabel = document.createElement('div');
+      itemsLabel.className = 'label';
+      itemsLabel.textContent = `Requested items (${requestItems.length}):`;
+      itemsDetail.appendChild(itemsLabel);
+
+      requestItems.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'request-item';
+        const typeDiv = document.createElement('div');
+        typeDiv.className = 'request-item-type';
+        typeDiv.textContent = `${item.type === 'fhir-profile' ? '📋 Profile' : '📝 Questionnaire'}: ${item.id}`;
+        const valDiv = document.createElement('div');
+        valDiv.className = 'value';
+        valDiv.textContent = item.profile || item.questionnaireUrl || 'Inline questionnaire';
+        itemDiv.appendChild(typeDiv);
+        itemDiv.appendChild(valDiv);
+        itemsDetail.appendChild(itemDiv);
+      });
+      requestBox.appendChild(itemsDetail);
+      contentEl.appendChild(requestBox);
+
+      if (requestItems.length === 0) {
+        const emptyMsg = document.createElement('div');
+        emptyMsg.style.cssText = 'text-align:center;padding:40px;color:#64748b';
+        emptyMsg.textContent = 'No specific data requested.';
+        contentEl.appendChild(emptyMsg);
+      } else {
+        // Group by type
+        const profiles = requestItems.filter(i => i.type === 'fhir-profile');
+        const questionnaires = requestItems.filter(i => i.type === 'fhir-questionnaire');
+
+        // Render Profiles Section
+        if (profiles.length > 0) {
+          const section = document.createElement('div');
+          section.className = 'section';
+
+          const h3 = document.createElement('h3');
+          h3.textContent = '📋 Requested Records';
+          section.appendChild(h3);
+
+          const label = document.createElement('label');
+          label.className = 'checkbox-card';
+
+          const input = document.createElement('input');
+          input.type = 'checkbox';
+          input.id = 'share-insurance';
+          input.checked = true;
+          label.appendChild(input);
+
+          const content = document.createElement('div');
+          content.className = 'checkbox-content';
+
+          const title = document.createElement('div');
+          title.className = 'checkbox-title';
+          title.textContent = 'Share Insurance Card & History';
+          content.appendChild(title);
+
+          const desc = document.createElement('div');
+          desc.className = 'checkbox-desc';
+          desc.textContent = 'Includes coverage details and claims history from Aetna';
+          content.appendChild(desc);
+
+          // Card Preview
+          const preview = document.createElement('div');
+          preview.className = 'card-preview';
+
+          const pHeader = document.createElement('h4');
+          pHeader.textContent = 'Aetna PPO Plan';
+          preview.appendChild(pHeader);
+
+          const pInfo = document.createElement('div');
+          pInfo.className = 'card-info';
+
+          const addInfo = (label, val) => {
+            const div = document.createElement('div');
+            const strong = document.createElement('strong');
+            strong.textContent = label + ': ';
+            div.appendChild(strong);
+            div.append(val);
+            pInfo.appendChild(div);
+          };
+
+          addInfo('Member', 'Jane Doe');
+          addInfo('Member ID', 'W123456789');
+          addInfo('Group', 'TECH-2024');
+
+          preview.appendChild(pInfo);
+          content.appendChild(preview);
+          label.appendChild(content);
+          section.appendChild(label);
+
+          // Check for Patient request and add Clinical checkbox
+          if (profiles.some(p => p.profile && (p.profile.includes('Patient') || p.profile.includes('patient')))) {
+            const labelClinical = document.createElement('label');
+            labelClinical.className = 'checkbox-card';
+
+            const inputClinical = document.createElement('input');
+            inputClinical.type = 'checkbox';
+            inputClinical.id = 'share-clinical';
+            inputClinical.checked = true;
+            labelClinical.appendChild(inputClinical);
+
+            const contentClinical = document.createElement('div');
+            contentClinical.className = 'checkbox-content';
+
+            const titleClinical = document.createElement('div');
+            titleClinical.className = 'checkbox-title';
+            titleClinical.textContent = 'Share Clinical History';
+            contentClinical.appendChild(titleClinical);
+
+            const descClinical = document.createElement('div');
+            descClinical.className = 'checkbox-desc';
+            descClinical.textContent = 'Includes medications, allergies, and conditions';
+            contentClinical.appendChild(descClinical);
+
+            labelClinical.appendChild(contentClinical);
+            section.appendChild(labelClinical);
+          }
+
+          contentEl.appendChild(section);
+        }
+
+        // Render Questionnaires Section
+        questionnaires.forEach((qItem, idx) => {
+          const section = document.createElement('div');
+          section.className = 'section';
+
+          const h3 = document.createElement('h3');
+          h3.textContent = '📝 ' + (qItem.questionnaire?.title || 'Form to Complete');
+          section.appendChild(h3);
+
+          const banner = document.createElement('div');
+          banner.className = 'auto-filled-banner';
+          banner.textContent = '✨ We found matching records and auto-filled your Intake Form';
+          section.appendChild(banner);
+
+          const label = document.createElement('label');
+          label.className = 'checkbox-card';
+
+          const input = document.createElement('input');
+          input.type = 'checkbox';
+          input.id = `share-${qItem.id}`;
+          input.checked = true;
+          label.appendChild(input);
+
+          const content = document.createElement('div');
+          content.className = 'checkbox-content';
+
+          const title = document.createElement('div');
+          title.className = 'checkbox-title';
+          title.textContent = 'Share Completed Form';
+          content.appendChild(title);
+
+          const formContainer = document.createElement('div');
+          formContainer.className = 'form-preview';
+
+          qItem.questionnaire.item.forEach(question => {
             const fieldId = `q-${idx}-${question.linkId}`;
-            const isRequired = question.required ? ' <span style="color:#dc2626">*</span>' : '';
+            const qItemDiv = document.createElement('div');
+            qItemDiv.className = 'questionnaire-item';
 
-            html += `<div class="questionnaire-item">`;
-            html += `<label for="${fieldId}">${question.text}${isRequired}</label>`;
+            const qLabel = document.createElement('label');
+            qLabel.htmlFor = fieldId;
+            qLabel.textContent = question.text;
+            if (question.required) {
+              const reqSpan = document.createElement('span');
+              reqSpan.style.color = '#dc2626';
+              reqSpan.textContent = ' *';
+              qLabel.appendChild(reqSpan);
+            }
+            qItemDiv.appendChild(qLabel);
 
-            // Pre-fill with random realistic values
+            // Pre-fill logic
             let defaultValue = '';
+            const randomIdx = 0; // Fixed for demo stability
+            const randomNames = ['Jane Doe'];
+            const randomDates = ['1985-06-15'];
+            const randomConcerns = ['Hypertension', 'Back pain', 'Headaches'];
+            const randomMeds = ['Lisinopril', 'Ibuprofen', 'None'];
+            const randomAllergies = ['Penicillin', 'Peanuts', 'None'];
+
             if (question.linkId === '1') defaultValue = randomNames[randomIdx];
             else if (question.linkId === '2') defaultValue = randomDates[randomIdx];
             else if (question.linkId === '3') defaultValue = randomConcerns[randomIdx];
@@ -439,187 +636,347 @@
             else if (question.linkId === '5') defaultValue = randomAllergies[randomIdx];
 
             const fieldClass = defaultValue ? 'auto-filled-field' : '';
+            let inputEl;
+
             if (question.type === 'text') {
-              html += `<textarea id="${fieldId}" rows="3" class="${fieldClass}">${defaultValue}</textarea>`;
-            } else if (question.type === 'date') {
-              html += `<input type="date" id="${fieldId}" value="${defaultValue}" class="${fieldClass}">`;
+              inputEl = document.createElement('textarea');
+              inputEl.rows = 3;
             } else {
-              html += `<input type="text" id="${fieldId}" value="${defaultValue}" class="${fieldClass}">`;
+              inputEl = document.createElement('input');
+              inputEl.type = question.type === 'date' ? 'date' : 'text';
             }
 
-            html += `</div>`;
+            inputEl.id = fieldId;
+            inputEl.value = defaultValue;
+            if (fieldClass) inputEl.className = fieldClass;
+
+            qItemDiv.appendChild(inputEl);
+            formContainer.appendChild(qItemDiv);
+          });
+
+
+          content.appendChild(formContainer);
+          label.appendChild(content);
+          section.appendChild(label);
+          contentEl.appendChild(section);
+        });
+      }
+
+      // Actions
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+
+      const cancelBtn = document.createElement('button');
+      cancelBtn.className = 'btn-secondary';
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.onclick = () => window.handleCancel();
+
+      const shareBtn = document.createElement('button');
+      shareBtn.className = 'btn-primary';
+      shareBtn.textContent = 'Share Selected Data';
+      shareBtn.onclick = () => window.handleShare();
+
+      actions.appendChild(cancelBtn);
+      actions.appendChild(shareBtn);
+      contentEl.appendChild(actions);
+
+      window.handleCancel = () => {
+        window.close();
+      };
+
+      window.handleShare = () => {
+        const responseItems = [];
+
+        console.log('[Flexpa] Starting share process');
+        console.log('[Flexpa] Request items:', requestItems);
+        console.log('[Flexpa] State:', state);
+        console.log('[Flexpa] Return URL:', returnUrl);
+
+        // Check if insurance card should be shared
+        const shareInsurance = document.getElementById('share-insurance')?.checked;
+        const shareClinical = document.getElementById('share-clinical')?.checked;
+
+        // Handle insurance card if selected
+        const coverageRequests = requestItems.filter(item => item.type === 'fhir-profile' && item.resourceType === 'Coverage');
+        if (shareInsurance && coverageRequests.length > 0) {
+          console.log('[Flexpa] Adding insurance card');
+
+          responseItems.push({
+            requestIds: coverageRequests.map(r => r.id),
+            type: 'fhir-resource',
+            contentType: 'application/fhir+json;fhirVersion=4.0.1',
+            label: 'Insurance Card',
+            body: {
+              resourceType: 'Coverage',
+              id: 'coverage-1',
+              status: 'active',
+              subscriberId: 'W123456789',
+              beneficiary: { reference: 'Patient/patient-1', display: 'Jane Doe' },
+              payor: [{ display: 'Aetna' }],
+              class: [
+                { type: { coding: [{ code: 'group' }] }, value: 'TECH-2024' }
+              ]
+            }
           });
         }
 
-        html += `
-              </div>
-            </div>
-          </label>
-        `;
-      });
-      html += `</div>`; // Close section
-    }
+        // Handle clinical summary if selected
+        const patientRequests = requestItems.filter(item => item.type === 'fhir-profile' && item.resourceType === 'Patient');
+        if (shareClinical && patientRequests.length > 0) {
+          console.log('[Flexpa] Adding clinical summary');
 
-    html += `
-      <div class="actions">
-        <button class="btn-secondary" onclick="handleCancel()">Cancel</button>
-        <button class="btn-primary" onclick="handleShare()">Share Selected Data</button>
-      </div>
-    `;
-
-    document.getElementById('content').innerHTML = html;
-
-    window.handleCancel = () => {
-      window.close();
-    };
-
-    window.handleShare = () => {
-      const responseItems = [];
-
-      console.log('[Flexpa] Starting share process');
-      console.log('[Flexpa] Request items:', requestItems);
-      console.log('[Flexpa] State:', state);
-      console.log('[Flexpa] Return URL:', returnUrl);
-
-      // Check if insurance card should be shared
-      const shareInsurance = document.getElementById('share-insurance')?.checked;
-      const shareClinical = document.getElementById('share-clinical')?.checked;
-
-      // Handle insurance card if selected
-      const coverageRequests = requestItems.filter(item => item.type === 'fhir-profile' && item.resourceType === 'Coverage');
-      if (shareInsurance && coverageRequests.length > 0) {
-        console.log('[Flexpa] Adding insurance card');
-
-        responseItems.push({
-          requestIds: coverageRequests.map(r => r.id),
-          type: 'fhir-resource',
-          contentType: 'application/fhir+json;fhirVersion=4.0.1',
-          label: 'Insurance Card',
-          body: {
-            resourceType: 'Coverage',
-            id: 'coverage-1',
-            status: 'active',
-            subscriberId: 'W123456789',
-            beneficiary: { reference: 'Patient/patient-1', display: 'Jane Doe' },
-            payor: [{ display: 'Aetna' }],
-            class: [
-              { type: { coding: [{ code: 'group' }] }, value: 'TECH-2024' }
-            ]
-          }
-        });
-      }
-
-      // Handle clinical summary if selected
-      const patientRequests = requestItems.filter(item => item.type === 'fhir-profile' && item.resourceType === 'Patient');
-      if (shareClinical && patientRequests.length > 0) {
-        console.log('[Flexpa] Adding clinical summary');
-
-        const entries = [
-          {
-            fullUrl: 'urn:uuid:patient-1',
-            resource: {
-              resourceType: 'Patient',
-              id: 'patient-1',
-              name: [{ text: 'Jane Doe', family: 'Doe', given: ['Jane'] }],
-              birthDate: '1985-06-15'
+          const entries = [
+            {
+              fullUrl: 'urn:uuid:patient-1',
+              resource: {
+                resourceType: 'Patient',
+                id: 'patient-1',
+                name: [{ text: 'Jane Doe', family: 'Doe', given: ['Jane'] }],
+                birthDate: '1985-06-15'
+              }
+            },
+            {
+              fullUrl: 'urn:uuid:allergy-1',
+              resource: { resourceType: 'AllergyIntolerance', id: 'allergy-1', patient: { reference: 'Patient/patient-1' }, code: { text: 'Penicillin' } }
+            },
+            {
+              fullUrl: 'urn:uuid:med-1',
+              resource: { resourceType: 'MedicationStatement', id: 'med-1', subject: { reference: 'Patient/patient-1' }, medicationCodeableConcept: { text: 'Lisinopril 10mg daily' } }
+            },
+            {
+              fullUrl: 'urn:uuid:condition-1',
+              resource: { resourceType: 'Condition', id: 'condition-1', subject: { reference: 'Patient/patient-1' }, code: { text: 'Essential Hypertension' } }
             }
-          },
-          {
-            fullUrl: 'urn:uuid:allergy-1',
-            resource: { resourceType: 'AllergyIntolerance', id: 'allergy-1', patient: { reference: 'Patient/patient-1' }, code: { text: 'Penicillin' } }
-          },
-          {
-            fullUrl: 'urn:uuid:med-1',
-            resource: { resourceType: 'MedicationStatement', id: 'med-1', subject: { reference: 'Patient/patient-1' }, medicationCodeableConcept: { text: 'Lisinopril 10mg daily' } }
-          },
-          {
-            fullUrl: 'urn:uuid:condition-1',
-            resource: { resourceType: 'Condition', id: 'condition-1', subject: { reference: 'Patient/patient-1' }, code: { text: 'Essential Hypertension' } }
-          }
-        ];
+          ];
 
-        responseItems.push({
-          requestIds: patientRequests.map(r => r.id),
-          type: 'fhir-resource',
-          contentType: 'application/fhir+json;fhirVersion=4.0.1',
-          label: 'Health Summary',
-          body: {
-            resourceType: 'Bundle',
-            type: 'collection',
-            entry: entries
+          responseItems.push({
+            requestIds: patientRequests.map(r => r.id),
+            type: 'fhir-resource',
+            contentType: 'application/fhir+json;fhirVersion=4.0.1',
+            label: 'Health Summary',
+            body: {
+              resourceType: 'Bundle',
+              type: 'collection',
+              entry: entries
+            }
+          });
+        }
+
+        // Handle questionnaire requests
+        const questionnaireRequests = requestItems.filter(item => item.type === 'fhir-questionnaire');
+        questionnaireRequests.forEach((qItem, idx) => {
+          const shareQuestionnaire = document.getElementById(`share - questionnaire - ${idx} `)?.checked;
+          if (!shareQuestionnaire) {
+            console.log(`[Flexpa] Skipping questionnaire ${idx} (not selected)`);
+            return;
           }
+
+          console.log(`[Flexpa] Adding questionnaire ${idx} `);
+          const questionnaire = qItem.questionnaire;
+          const items = [];
+
+          // Build response items from questionnaire structure
+          if (questionnaire && questionnaire.item) {
+            questionnaire.item.forEach((question) => {
+              const fieldId = `q-${idx}-${question.linkId}`;
+              const value = document.getElementById(fieldId)?.value || '';
+
+              if (value) {
+                const answer = question.type === 'date'
+                  ? [{ valueDate: value }]
+                  : [{ valueString: value }];
+
+                items.push({
+                  linkId: question.linkId,
+                  text: question.text,
+                  answer: answer
+                });
+              }
+            });
+          }
+
+          responseItems.push({
+            requestIds: [qItem.id],
+            type: 'fhir-questionnaire-response',
+            contentType: 'application/fhir+json',
+            label: questionnaire?.title || 'Questionnaire Response',
+            questionnaire: qItem.questionnaireUrl || questionnaire?.id || 'inline',
+            body: {
+              resourceType: 'QuestionnaireResponse',
+              questionnaire: questionnaire?.id,
+              status: 'completed',
+              authored: new Date().toISOString(),
+              item: items
+            }
+          });
         });
-      }
 
-      // Handle questionnaire requests
-      const questionnaireRequests = requestItems.filter(item => item.type === 'fhir-questionnaire');
-      questionnaireRequests.forEach((qItem, idx) => {
-        const shareQuestionnaire = document.getElementById(`share-questionnaire-${idx}`)?.checked;
-        if (!shareQuestionnaire) {
-          console.log(`[Flexpa] Skipping questionnaire ${idx} (not selected)`);
+        console.log('[Flexpa] Response items:', responseItems);
+
+        const payload = {
+          items: responseItems
+        };
+
+        // OID4VP Response - Split Payload Format
+        if (protocol === 'openid4vp') {
+          const vp_token = {}; // Map: request_id -> [artifact_indices]
+          const smart_artifacts = []; // Array: [actual_data]
+          const artifactCache = new Map(); // De-duplication cache: data_hash -> index
+
+          // Helper to find matching resources
+          const findResources = (resourceType) => {
+            const matches = [];
+            if (resourceType === 'Coverage') {
+              matches.push({
+                resourceType: 'Coverage',
+                id: 'coverage-1',
+                status: 'active',
+                subscriberId: 'W123456789',
+                beneficiary: { reference: 'Patient/patient-1', display: 'Jane Doe' },
+                payor: [{ display: 'Aetna' }],
+                class: [{ type: { coding: [{ code: 'group' }] }, value: 'TECH-2024' }]
+              });
+            }
+            if (resourceType === 'Patient') {
+              matches.push({
+                resourceType: 'Patient',
+                id: 'patient-1',
+                name: [{ text: 'Jane Doe', family: 'Doe', given: ['Jane'] }],
+                birthDate: '1985-06-15'
+              });
+            }
+            if (resourceType === 'QuestionnaireResponse') {
+              const items = [];
+              const qItems = requestItems.filter(item => item.type === 'fhir-questionnaire');
+              qItems.forEach((qItem, idx) => {
+                if (qItem.questionnaire && qItem.questionnaire.item) {
+                  qItem.questionnaire.item.forEach(q => {
+                    const fieldId = `q-${idx}-${q.linkId}`;
+                    const val = document.getElementById(fieldId)?.value;
+                    if (val) {
+                      items.push({ linkId: q.linkId, answer: [{ valueString: val }] });
+                    }
+                  });
+                }
+              });
+
+              matches.push({
+                resourceType: 'QuestionnaireResponse',
+                status: 'completed',
+                item: items
+              });
+            }
+            return matches;
+          };
+
+          // Helper to add artifact and return its index (with deduplication)
+          const addArtifact = (data) => {
+            const hash = JSON.stringify(data);
+            if (artifactCache.has(hash)) {
+              return artifactCache.get(hash);
+            }
+            const index = smart_artifacts.length;
+            smart_artifacts.push(data);
+            artifactCache.set(hash, index);
+            return index;
+          };
+
+          // Iterate over dcql_query credentials
+          if (req.dcql_query && req.dcql_query.credentials) {
+            req.dcql_query.credentials.forEach(cred => {
+              // Find matching request item to check consent
+              const item = requestItems.find(i => i.id === cred.id);
+              if (!item) {
+                console.log(`[Flexpa] No matching item for ${cred.id}`);
+                return;
+              }
+
+              // Infer resource type from profile URL (flattened format)
+              // Infer resource type from profile URL (flattened format)
+              let resourceType = null;
+              const meta = cred.meta || {};
+              const profile = meta.profile || cred.profile;
+              const questionnaire = meta.questionnaire || cred.questionnaire;
+
+              if (profile) {
+                // Extract from URL like .../StructureDefinition/Coverage or .../StructureDefinition/us-core-patient
+                const match = profile.match(/StructureDefinition\/([A-Za-z0-9-]+)/);
+                if (match) {
+                  // Handle both "Coverage" and "C4DIC-Coverage" or "us-core-patient"
+                  const def = match[1];
+                  if (def.includes('Coverage')) resourceType = 'Coverage';
+                  else if (def.includes('Patient') || def.includes('patient')) resourceType = 'Patient';
+                  else resourceType = def; // Fallback
+                }
+              }
+              if (questionnaire) resourceType = 'QuestionnaireResponse';
+
+              console.log(`[Flexpa] Processing ${cred.id}:`, {
+                itemType: item.type,
+                resourceType,
+                profile: cred.profile
+              });
+
+              let isShared = false;
+              if (item.type === 'fhir-profile') {
+                console.log(`[Flexpa] Checking consent for ${resourceType}`);
+                if (resourceType === 'Coverage') {
+                  isShared = document.getElementById('share-insurance')?.checked;
+                  console.log(`[Flexpa] share-insurance checked:`, isShared);
+                } else if (resourceType === 'Patient') {
+                  isShared = document.getElementById('share-clinical')?.checked;
+                  console.log(`[Flexpa] share-clinical checked:`, isShared);
+                }
+              } else if (item.type === 'fhir-questionnaire') {
+                isShared = document.getElementById(`share-${item.id}`)?.checked;
+                console.log(`[Flexpa] share-${item.id} checked:`, isShared);
+              }
+
+              if (isShared) {
+                console.log(`[Flexpa] Sharing ${cred.id} (format: ${cred.format})`);
+                if (cred.format === 'smart_artifact') {
+                  const resources = findResources(resourceType);
+                  console.log(`[Flexpa] Found ${resources.length} resources for ${resourceType}`);
+
+                  // Wrap each resource with typed format and add to artifacts
+                  const indices = resources.map(res => {
+                    const wrapped = {
+                      type: 'fhir_resource',
+                      data: res
+                    };
+                    const idx = addArtifact(wrapped);
+                    console.log(`[Flexpa] Added artifact at index ${idx}`, wrapped);
+                    return idx;
+                  });
+                  vp_token[cred.id] = indices;
+                }
+              } else {
+                console.log(`[Flexpa] User declined to share ${cred.id}`);
+              }
+            });
+
+            console.log('[Flexpa] Generated vp_token:', vp_token);
+            console.log('[Flexpa] Generated smart_artifacts:', smart_artifacts);
+          }
+
+          console.log('[Flexpa] Response items:', { vp_token, artifactCount: smart_artifacts.length });
+          const redirectUrl = returnUrl + '#vp_token=' + encodeURIComponent(JSON.stringify(vp_token)) + '&smart_artifacts=' + encodeURIComponent(JSON.stringify(smart_artifacts)) + '&state=' + encodeURIComponent(state);
+          console.log('[Flexpa] Redirecting to:', redirectUrl);
+          location.href = redirectUrl;
           return;
         }
 
-        console.log(`[Flexpa] Adding questionnaire ${idx}`);
-        const questionnaire = qItem.questionnaire;
-        const items = [];
+        // Legacy Response
+        const result = { v: 1, state, payload };
+        const resB64 = b64u(te.encode(JSON.stringify(result)));
+        const returnURL = new URL(returnUrl);
+        returnURL.hash = 'res=' + resB64;
 
-        // Build response items from questionnaire structure
-        if (questionnaire && questionnaire.item) {
-          questionnaire.item.forEach((question) => {
-            const fieldId = `q-${idx}-${question.linkId}`;
-            const value = document.getElementById(fieldId)?.value || '';
-
-            if (value) {
-              const answer = question.type === 'date'
-                ? [{ valueDate: value }]
-                : [{ valueString: value }];
-
-              items.push({
-                linkId: question.linkId,
-                text: question.text,
-                answer: answer
-              });
-            }
-          });
-        }
-
-        responseItems.push({
-          requestIds: [qItem.id],
-          type: 'fhir-questionnaire-response',
-          contentType: 'application/fhir+json',
-          label: questionnaire?.title || 'Questionnaire Response',
-          questionnaire: qItem.questionnaireUrl || questionnaire?.id || 'inline',
-          body: {
-            resourceType: 'QuestionnaireResponse',
-            questionnaire: questionnaire?.id,
-            status: 'completed',
-            authored: new Date().toISOString(),
-            item: items
-          }
-        });
-      });
-
-      console.log('[Flexpa] Response items:', responseItems);
-
-      const payload = {
-        items: responseItems
+        console.log('[Flexpa] Returning to:', returnURL.toString());
+        location.href = returnURL.toString();
       };
-
-      const result = { v: 1, state, payload };
-      console.log('[Flexpa] Result envelope:', result);
-
-      const resB64 = b64u(te.encode(JSON.stringify(result)));
-      console.log('[Flexpa] Encoded response (first 100 chars):', resB64.substring(0, 100));
-
-      const returnURL = new URL(returnUrl);
-      returnURL.hash = 'res=' + resB64;
-
-      console.log('[Flexpa] Returning to:', returnURL.toString());
-      console.log('[Flexpa] Response will be delivered via location change');
-      location.href = returnURL.toString();
-    };
-  })();
+    })();
   </script>
 </body>
+
 </html>

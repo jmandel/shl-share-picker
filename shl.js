@@ -65,7 +65,36 @@
         const msg = ev.data;
         console.log('[SHL] Received message on channel:', msg);
 
-        if (!msg || msg.state !== state || !msg.res) return;
+        if (!msg || msg.state !== state) return;
+
+        // OID4VP Response - Split Payload Format with Typed Wrappers
+        if (msg.vp_token && msg.smart_artifacts) {
+          console.log('[SHL] Received OID4VP split-payload response');
+
+          // Return the full message so the app can inspect smart_artifacts directly
+          cleanup();
+          resolve({
+            type: 'digital_credential',
+            protocol,
+            data: JSON.stringify(msg) // Return full msg object
+          });
+          return;
+        }
+
+        // Legacy OID4VP Response (for backward compatibility)
+        if (msg.vp_token) {
+          console.log('[SHL] Received legacy OID4VP token');
+          cleanup();
+          resolve({
+            type: 'digital_credential',
+            protocol,
+            data: JSON.stringify(msg.vp_token)
+          });
+          return;
+        }
+
+        // Legacy Response
+        if (!msg.res) return;
 
         try {
           const ret = decJ(msg.res);
@@ -103,7 +132,34 @@
         }
       }
     });
+    // OID4VP Flow
+    if (protocol === 'openid4vp') {
+      const clientId = location.origin;
+      const nonce = rand();
 
+      // Construct OID4VP Authorization Request
+      const params = new URLSearchParams({
+        protocol: 'openid4vp', // Custom signal for our picker
+        client_id: clientId,
+        response_type: 'vp_token',
+        response_mode: 'fragment',
+        redirect_uri: returnUrl + 'callback.html', // Assumes callback.html is in same dir
+        nonce: nonce,
+        state: state,
+        dcql_query: JSON.stringify(credentialRequest.digital.requests[0].data.dcql_query)
+      });
+
+      const url = `${checkinBase}/?${params.toString()}`;
+      console.log('[SHL] Opening OID4VP check-in:', url);
+
+      pop = window.open(url, '_blank');
+      if (!pop) {
+        chan.close();
+        throw new Error('Popup blocked - please allow popups for this site');
+      }
+
+      return done;
+    }
     // Open app picker - pass through the digital credential request structure
     const reqEnvelope = encJ({
       v: 1,
@@ -153,13 +209,26 @@
       bc.close();
 
       // Show user-friendly message
-      document.body.innerHTML = `
-        <div style="font-family:system-ui;padding:40px;text-align:center;background:#0f141c;color:#e9eef5;min-height:100vh">
-          <h1 style="color:#4ade80">✓ Success</h1>
-          <p>Data shared successfully. This tab will close automatically.</p>
-          <p style="color:#94a3b8;font-size:14px">If it doesn't close, you can safely close it manually.</p>
-        </div>
-      `;
+      // Show user-friendly message
+      document.body.textContent = '';
+      const div = document.createElement('div');
+      div.style.cssText = 'font-family:system-ui;padding:40px;text-align:center;background:#0f141c;color:#e9eef5;min-height:100vh';
+
+      const h1 = document.createElement('h1');
+      h1.style.cssText = 'color:#4ade80';
+      h1.textContent = '✓ Success';
+
+      const p1 = document.createElement('p');
+      p1.textContent = 'Data shared successfully. This tab will close automatically.';
+
+      const p2 = document.createElement('p');
+      p2.style.cssText = 'color:#94a3b8;font-size:14px';
+      p2.textContent = 'If it doesn\'t close, you can safely close it manually.';
+
+      div.appendChild(h1);
+      div.appendChild(p1);
+      div.appendChild(p2);
+      document.body.appendChild(div);
 
       // Attempt to close self
       try {

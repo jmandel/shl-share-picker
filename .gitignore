@@ -1,18 +1,16 @@
-# OS files
+node_modules
 .DS_Store
-Thumbs.db
-
-# Editor directories and files
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# Logs
-*.log
-npm-debug.log*
-
-# Temporary files
-*.tmp
-.cache/
+# Copied shared files
+requester/shl.js
+requester/config.js
+checkin/shl.js
+checkin/config.js
+source-bwell/shl.js
+source-bwell/config.js
+source-flexpa/shl.js
+source-flexpa/config.js
+source-premera/shl.js
+source-premera/config.js
+test-results/
+playwright-report/
+build/

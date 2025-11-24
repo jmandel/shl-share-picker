@@ -25,9 +25,19 @@ const ZTWRConfig = (() => {
         url: 'http://checkin.localhost:3001',
         apps: [
           {
+            id: 'premera',
+            name: 'Premera Blue Cross',
+            description: 'Health insurance member portal',
+            category: 'healthplan',
+            color: '#0099D8',
+            logo: 'P',
+            launchBase: 'http://premera.localhost:3004'
+          },
+          {
             id: 'flexpa',
             name: 'Flexpa',
             description: 'Connected health data platform',
+            category: 'phr',
             color: '#0d9488',
             accentColor: '#84cc16',
             logo: 'F',
@@ -38,17 +48,10 @@ const ZTWRConfig = (() => {
             id: 'bwell',
             name: 'b.well Connected Health',
             description: 'AI-powered platform for connected care',
+            category: 'phr',
             color: '#2a2f74',
             logo: 'b',
             launchBase: 'http://bwell.localhost:3003'
-          },
-          {
-            id: 'premera',
-            name: 'Premera Blue Cross',
-            description: 'Health insurance member portal',
-            color: '#0099D8',
-            logo: 'P',
-            launchBase: 'http://premera.localhost:3004'
           }
         ]
       }
