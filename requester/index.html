@@ -502,7 +502,7 @@
           return section;
         };
 
-        logContainer.appendChild(createSection('Request (DCQL)', request));
+        logContainer.appendChild(createSection('Request (OID4VP)', request));
         logContainer.appendChild(createSection('Response (OID4VP)', response));
       };
 
@@ -564,6 +564,8 @@
         };
 
         try {
+          // Render request immediately once parameters are known
+          let pendingRequestLog = null;
           const result = await SHL.request(
             {
               digital: {
@@ -577,15 +579,32 @@
             },
             {
               checkinBase: ZTWRConfig.requester.checkin,
-              clientName: "Dr. Mandel's Family Medicine"
+              onRequestStart: (params) => {
+                pendingRequestLog = params;
+                renderTransactionBrowser(params, { status: 'Waiting for response...' });
+                appendLog('[Request Sent]', params);
+              }
             }
           );
 
           // Parse the payload (now the full OID4VP response)
           const fullResponse = JSON.parse(result.data);
 
+          // Construct a richer request log with protocol parameters
+          const redirectUri = new URL(location.href);
+          redirectUri.hash = '';
+          const redirectUriStr = redirectUri.toString();
+          const requestLog = pendingRequestLog || {
+            client_id: `redirect_uri:${redirectUriStr}`,
+            response_type: 'vp_token',
+            response_mode: 'fragment',
+            state: fullResponse.state,
+            nonce: fullResponse.nonce,
+            dcql_query: dcqlQuery
+          };
+
           // Render Transaction Browser
-          renderTransactionBrowser(dcqlQuery, fullResponse);
+          renderTransactionBrowser(requestLog, fullResponse);
 
           // Rehydrate logic for App UI
           // Map vp_token indices to smart_artifacts

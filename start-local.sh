@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Zero-Trust Web Rails - Multi-Origin Local Testing
-# Starts 5 servers on different localhost subdomains/ports
+# Starts demo servers on different localhost subdomains/ports
 
 # Cleanup function to kill all child processes
 cleanup() {
@@ -17,12 +17,10 @@ trap cleanup SIGINT SIGTERM
 
 echo "🚀 Starting SMART Health Check-in demo in multi-origin mode..."
 echo ""
-echo "This will start 5 servers:"
+echo "This will start 3 servers:"
 echo "  • Requester:  http://requester.localhost:3000"
 echo "  • Check-in:   http://checkin.localhost:3001"
 echo "  • Flexpa:     http://flexpa.localhost:3002"
-echo "  • b.well:     http://bwell.localhost:3003"
-echo "  • Premera:    http://premera.localhost:3004"
 echo ""
 echo "Press Ctrl+C to stop all servers"
 echo ""
@@ -41,8 +39,6 @@ start_server() {
 start_server "requester" 3000 "Requester"
 start_server "checkin" 3001 "Check-in"
 start_server "source-flexpa" 3002 "Flexpa"
-start_server "source-bwell" 3003 "b.well"
-start_server "source-premera" 3004 "Premera"
 
 # Wait a moment for servers to start
 sleep 2

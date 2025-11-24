@@ -214,36 +214,18 @@
       if (protocol === 'openid4vp') {
         // OID4VP Flow
         try {
+          const clientIdRaw = urlParams.get('client_id');
+
           req = {
             protocol: 'openid4vp',
-            client_id: urlParams.get('client_id'),
+            client_id: clientIdRaw,
             response_type: urlParams.get('response_type'),
             response_mode: urlParams.get('response_mode'),
-            redirect_uri: urlParams.get('redirect_uri'),
             nonce: urlParams.get('nonce'),
             state: urlParams.get('state'),
-            dcql_query: JSON.parse(urlParams.get('dcql_query') || '{}'),
-            client_metadata: JSON.parse(urlParams.get('client_metadata') || '{}')
+            dcql_query: JSON.parse(urlParams.get('dcql_query') || '{}')
           };
           console.log('[Check-in] Request (OID4VP):', req);
-
-          // Extract client name from client_id (origin) - STRICT ORIGIN ONLY
-          const clientName = req.client_id;
-          console.log('[Check-in] Client Name (Origin):', clientName);
-          if (clientName) {
-            const titleEl = document.getElementById('header-title');
-            titleEl.textContent = ''; // Clear existing
-            titleEl.append('Connect ');
-
-            const nameSpan = document.createElement('span');
-            nameSpan.className = 'requester-name';
-            nameSpan.textContent = clientName; // Safe text insertion
-            titleEl.appendChild(nameSpan);
-
-            titleEl.append(' to...');
-          } else {
-            console.warn('[Check-in] No client_id found in request');
-          }
         } catch (e) {
           document.getElementById('loading').style.display = 'none';
           document.getElementById('error').style.display = 'block';
@@ -263,27 +245,6 @@
         try {
           req = decJ(reqB64); // { v, state, returnUrl, digital: { requests: [...] } }
           console.log('[Check-in] Request:', req);
-
-          // Extract client name if provided
-          // Extract client name if provided (Legacy - still unsafe if not sanitized, but let's stick to origin for consistency or sanitize)
-          // For legacy, we might not have a clear "client_id" in the same way, but let's try to be safe.
-          // If the legacy request has clientName, we treat it as self-asserted.
-          // Ideally we should warn. For now, let's just use textContent.
-          const clientName = req.clientName || req.digital?.requests?.[0]?.clientName;
-
-          // Update header if we have a client name
-          if (clientName) {
-            const titleEl = document.getElementById('header-title');
-            titleEl.textContent = '';
-            titleEl.append('Connect ');
-
-            const nameSpan = document.createElement('span');
-            nameSpan.className = 'requester-name';
-            nameSpan.textContent = clientName; // Safe text insertion
-            titleEl.appendChild(nameSpan);
-
-            titleEl.append(' to...');
-          }
 
         } catch (e) {
           document.getElementById('loading').style.display = 'none';
@@ -401,17 +362,15 @@
 
               // Construct OID4VP-style handoff
               // We'll pass the original OID4VP params + the specific dcql_query if needed.
-              // Actually, the app needs: client_id, nonce, state, redirect_uri, dcql_query.
+              // Actually, the app needs: client_id, nonce, state, dcql_query.
 
               const appParams = new URLSearchParams();
               if (req.protocol === 'openid4vp') {
                 // protocol param is NOT sent on the wire for OID4VP
                 // appParams.set('protocol', 'openid4vp'); 
 
-                // OID4VP: Use redirect_uri prefix for client_id
-                // The value MUST be the redirect_uri itself
-                const clientId = `redirect_uri:${req.redirect_uri}`;
-                appParams.set('client_id', clientId);
+                // OID4VP: Use the provided client_id as-is (redirect_uri: prefix)
+                appParams.set('client_id', req.client_id);
 
                 appParams.set('response_type', 'vp_token');
                 appParams.set('response_mode', 'fragment');

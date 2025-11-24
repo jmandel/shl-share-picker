@@ -332,6 +332,11 @@
       };
 
       const decJ = (s) => JSON.parse(td.decode(ub64(s)));
+      const contentEl = document.getElementById('content');
+      const showError = (msg) => {
+        contentEl.textContent = msg;
+        contentEl.style.cssText = 'text-align:center;color:#dc2626;padding:40px';
+      };
 
       // Parse Navigator Credentials request from hash OR query
       const hashParams = new URLSearchParams(location.hash.slice(1));
@@ -344,17 +349,23 @@
       const isOid4vp = getParam('response_type') === 'vp_token';
 
       let req = {};
-      let state, returnUrl, protocol, requestItems;
+      let state, returnUrl, protocol, requestItems, nonce;
 
       if (isOid4vp) {
         state = getParam('state');
         // Extract redirect_uri from client_id (remove 'redirect_uri:' prefix)
         const clientId = getParam('client_id');
-        if (clientId && clientId.startsWith('redirect_uri:')) {
-          returnUrl = clientId.substring('redirect_uri:'.length);
-        } else {
-          // Fallback or error if malformed
-          returnUrl = getParam('redirect_uri');
+        const redirectPrefix = 'redirect_uri:';
+        if (!clientId || !clientId.startsWith(redirectPrefix)) {
+          showError('Invalid client_id: must start with redirect_uri:');
+          return;
+        }
+
+        returnUrl = clientId.substring(redirectPrefix.length);
+        nonce = getParam('nonce');
+        if (!nonce) {
+          showError('Missing nonce in authorization request');
+          return;
         }
 
         protocol = 'openid4vp';
@@ -418,7 +429,6 @@
 
       // Render UI based on request items
 
-      const contentEl = document.getElementById('content');
       contentEl.textContent = ''; // Clear existing
 
       // Render Request Box
@@ -444,7 +454,15 @@
       };
 
       addDetail('Protocol:', protocol);
-      addDetail('Requesting site:', returnUrl);
+      if (protocol === 'openid4vp') {
+        addDetail('client_id:', getParam('client_id'));
+        addDetail('response_type:', getParam('response_type'));
+        addDetail('response_mode:', getParam('response_mode'));
+        addDetail('state:', state);
+        addDetail('nonce:', nonce);
+      } else {
+        addDetail('Requesting site:', returnUrl);
+      }
 
       const itemsDetail = document.createElement('div');
       itemsDetail.className = 'request-detail';
@@ -960,7 +978,7 @@
           }
 
           console.log('[Flexpa] Response items:', { vp_token, artifactCount: smart_artifacts.length });
-          const redirectUrl = returnUrl + '#vp_token=' + encodeURIComponent(JSON.stringify(vp_token)) + '&smart_artifacts=' + encodeURIComponent(JSON.stringify(smart_artifacts)) + '&state=' + encodeURIComponent(state);
+          const redirectUrl = returnUrl + '#vp_token=' + encodeURIComponent(JSON.stringify(vp_token)) + '&smart_artifacts=' + encodeURIComponent(JSON.stringify(smart_artifacts)) + '&state=' + encodeURIComponent(state) + '&nonce=' + encodeURIComponent(nonce);
           console.log('[Flexpa] Redirecting to:', redirectUrl);
           location.href = redirectUrl;
           return;

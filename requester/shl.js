@@ -31,7 +31,7 @@
   /**
    * Initiate a credential request (Navigator Credentials API compatible)
    * @param {Object} credentialRequest - { digital: { requests: [{ protocol, data }] } }
-   * @param {Object} opts - Options { checkinBase }
+   * @param {Object} opts - Options { checkinBase, onRequestStart?: (params) => void }
    * @returns {Promise<Object>} - { type, protocol, data }
    */
   async function request(credentialRequest, opts) {
@@ -42,13 +42,15 @@
     const checkinBase = (opts?.checkinBase || opts?.gatewayBase || '').replace(/\/+$/, '');
     if (!checkinBase) throw new Error('checkinBase required');
 
-    const state = rand();
-    const returnUrl = location.origin + location.pathname;
-
-    // Extract protocol from first request for return value compatibility
     const protocol = credentialRequest.digital.requests[0].protocol;
+    if (protocol !== 'openid4vp') {
+      throw new Error('Only openid4vp protocol is supported');
+    }
 
-    console.log('[SHL] Initiating request:', { credentialRequest, state, returnUrl });
+    const state = rand();
+    const onRequestStart = typeof opts?.onRequestStart === 'function' ? opts.onRequestStart : null;
+
+    console.log('[SHL] Initiating request:', { credentialRequest, state });
 
     // Prepare listeners BEFORE opening popup
     const chan = new BroadcastChannel('shl-' + state);
@@ -66,56 +68,19 @@
         console.log('[SHL] Received message on channel:', msg);
 
         if (!msg || msg.state !== state) return;
+        if (msg.origin && msg.origin !== location.origin) {
+          console.warn('[SHL] Origin mismatch, ignoring message');
+          return;
+        }
 
-        // OID4VP Response - Split Payload Format with Typed Wrappers
         if (msg.vp_token && msg.smart_artifacts) {
           console.log('[SHL] Received OID4VP split-payload response');
-
-          // Return the full message so the app can inspect smart_artifacts directly
           cleanup();
           resolve({
             type: 'digital_credential',
             protocol,
-            data: JSON.stringify(msg) // Return full msg object
+            data: JSON.stringify(msg)
           });
-          return;
-        }
-
-        // Legacy OID4VP Response (for backward compatibility)
-        if (msg.vp_token) {
-          console.log('[SHL] Received legacy OID4VP token');
-          cleanup();
-          resolve({
-            type: 'digital_credential',
-            protocol,
-            data: JSON.stringify(msg.vp_token)
-          });
-          return;
-        }
-
-        // Legacy Response
-        if (!msg.res) return;
-
-        try {
-          const ret = decJ(msg.res);
-          if (ret.state !== state) {
-            console.warn('[SHL] State mismatch');
-            return;
-          }
-
-          const plaintext = JSON.stringify(ret.payload);
-
-          console.log('[SHL] Request successful!');
-          cleanup();
-          resolve({
-            type: 'digital_credential',
-            protocol,
-            data: plaintext
-          });
-        } catch (e) {
-          console.error('[SHL] Error processing response:', e);
-          cleanup();
-          reject(e);
         }
       };
 
@@ -132,44 +97,37 @@
         }
       }
     });
-    // OID4VP Flow
-    if (protocol === 'openid4vp') {
-      const clientId = location.origin;
-      const nonce = rand();
 
-      // Construct OID4VP Authorization Request
-      const params = new URLSearchParams({
-        protocol: 'openid4vp', // Custom signal for our picker
+    const redirectUrl = new URL(location.href);
+    redirectUrl.hash = '';
+    const redirectUri = redirectUrl.toString();
+    const clientId = `redirect_uri:${redirectUri}`;
+    const nonce = rand();
+
+    const params = new URLSearchParams({
+      protocol: 'openid4vp', // Custom signal for our picker
+      client_id: clientId,
+      response_type: 'vp_token',
+      response_mode: 'fragment',
+      nonce: nonce,
+      state: state,
+      dcql_query: JSON.stringify(credentialRequest.digital.requests[0].data.dcql_query)
+    });
+
+    if (onRequestStart) {
+      onRequestStart({
+        protocol,
         client_id: clientId,
         response_type: 'vp_token',
         response_mode: 'fragment',
-        redirect_uri: returnUrl + 'callback.html', // Assumes callback.html is in same dir
-        nonce: nonce,
-        state: state,
-        dcql_query: JSON.stringify(credentialRequest.digital.requests[0].data.dcql_query)
+        state,
+        nonce,
+        dcql_query: credentialRequest.digital.requests[0].data.dcql_query
       });
-
-      const url = `${checkinBase}/?${params.toString()}`;
-      console.log('[SHL] Opening OID4VP check-in:', url);
-
-      pop = window.open(url, '_blank');
-      if (!pop) {
-        chan.close();
-        throw new Error('Popup blocked - please allow popups for this site');
-      }
-
-      return done;
     }
-    // Open app picker - pass through the digital credential request structure
-    const reqEnvelope = encJ({
-      v: 1,
-      state,
-      returnUrl,
-      digital: credentialRequest.digital
-    });
 
-    const url = `${checkinBase}/#req=${encodeURIComponent(reqEnvelope)}`;
-    console.log('[SHL] Opening check-in:', url);
+    const url = `${checkinBase}/?${params.toString()}`;
+    console.log('[SHL] Opening OID4VP check-in:', url);
 
     pop = window.open(url, '_blank');
     if (!pop) {
@@ -190,58 +148,38 @@
     if (!h) return false;
 
     const p = new URLSearchParams(h);
-    const res = p.get('res');
-    if (!res) return false;
+    const vpToken = p.get('vp_token');
+    const smartArtifacts = p.get('smart_artifacts');
+    const state = p.get('state');
+    const nonce = p.get('nonce');
+    if (!(vpToken && smartArtifacts && state && nonce)) return false;
 
-    console.log('[SHL] Detected return context');
+    console.log('[SHL] Detected OID4VP return context');
 
-    try {
-      const ret = decJ(res);
-      if (!ret?.state) {
-        console.warn('[SHL] Return data missing state');
-        return false;
-      }
+    const bc = new BroadcastChannel('shl-' + state);
+    bc.postMessage({
+      origin: location.origin,
+      state,
+      nonce,
+      vp_token: JSON.parse(vpToken),
+      smart_artifacts: JSON.parse(smartArtifacts)
+    });
+    bc.close();
 
-      console.log('[SHL] Broadcasting result to original tab, state:', ret.state);
+    document.body.textContent = '';
+    const div = document.createElement('div');
+    div.style.cssText = 'font-family:system-ui;padding:40px;text-align:center;background:#0f141c;color:#e9eef5;min-height:100vh';
+    const h1 = document.createElement('h1');
+    h1.style.cssText = 'color:#4ade80';
+    h1.textContent = '✓ Shared';
+    const p1 = document.createElement('p');
+    p1.textContent = 'You can close this window.';
+    div.appendChild(h1);
+    div.appendChild(p1);
+    document.body.appendChild(div);
+    window.close();
 
-      const bc = new BroadcastChannel('shl-' + ret.state);
-      bc.postMessage({ state: ret.state, res });
-      bc.close();
-
-      // Show user-friendly message
-      // Show user-friendly message
-      document.body.textContent = '';
-      const div = document.createElement('div');
-      div.style.cssText = 'font-family:system-ui;padding:40px;text-align:center;background:#0f141c;color:#e9eef5;min-height:100vh';
-
-      const h1 = document.createElement('h1');
-      h1.style.cssText = 'color:#4ade80';
-      h1.textContent = '✓ Success';
-
-      const p1 = document.createElement('p');
-      p1.textContent = 'Data shared successfully. This tab will close automatically.';
-
-      const p2 = document.createElement('p');
-      p2.style.cssText = 'color:#94a3b8;font-size:14px';
-      p2.textContent = 'If it doesn\'t close, you can safely close it manually.';
-
-      div.appendChild(h1);
-      div.appendChild(p1);
-      div.appendChild(p2);
-      document.body.appendChild(div);
-
-      // Attempt to close self
-      try {
-        window.close();
-      } catch (e) {
-        console.log('[SHL] Could not auto-close (expected in some browsers)');
-      }
-
-      return true;
-    } catch (e) {
-      console.error('[SHL] Error handling return:', e);
-      return false;
-    }
+    return true;
   }
 
   // Export API

@@ -16,7 +16,7 @@ The Authorization Request MUST follow the requirements of OpenID for Verifiable 
 *   `response_mode`: MUST be `fragment` (for browser-based flows).
 *   `client_id`: MUST use the `redirect_uri` Client Identifier Prefix.
     *   Format: `redirect_uri:<Redirect_URI>`
-    *   Example: `redirect_uri:https://clinic.example.com/callback`
+    *   Example: `redirect_uri:https://clinic.example.com/return`
 *   `nonce`: REQUIRED.
 *   `state`: REQUIRED.
 *   `dcql_query`: REQUIRED. A JSON-encoded DCQL query object (defined in Section 2).
@@ -24,7 +24,7 @@ The Authorization Request MUST follow the requirements of OpenID for Verifiable 
 **Example Request:**
 ```
 https://wallet.example.com/authorize?
-  client_id=redirect_uri:https://clinic.example.com/callback&
+  client_id=redirect_uri:https://clinic.example.com/return&
   response_type=vp_token&
   response_mode=fragment&
   state=...&
@@ -220,8 +220,8 @@ const result = await SHL.request({
 ### 3.2 Transport Mechanism
 
 1.  **Request**: The shim opens the Health App URL (via a Picker) in a popup window with the OID4VP query parameters.
-2.  **Response**: The Health App redirects the popup to the `redirect_uri` (e.g., `callback.html`) with the response in the URL fragment.
-3.  **Handoff**: The `callback.html` page uses a `BroadcastChannel` to send the `vp_token` and `smart_artifacts` back to the original tab.
+2.  **Response**: The Health App redirects the popup back to the original requesting page (`redirect_uri`) with the response in the URL fragment.
+3.  **Handoff**: The returned popup (now at the requester URL) detects the response via `SHL.maybeHandleReturn()`, relays `vp_token` and `smart_artifacts` to the original tab over `BroadcastChannel`, and closes itself.
 4.  **Completion**: The shim receives the data, closes the popup, rehydrates the response, and resolves the Promise.
 
 ## 4. Reference Implementation (Demo)
@@ -242,7 +242,7 @@ To simulate the cross-origin security model locally:
 ./start-local.sh
 ```
 
-This starts 5 servers on different ports (Requester, Check-in, and Health apps).
+This starts 3 servers on different ports (Requester, Check-in, and the Flexpa health app).
 Visit **http://requester.localhost:3000** to try the flow.
 
 ## 5. License
