@@ -18,8 +18,7 @@
     "src"
   ],
   "scripts": {
-    "build": "bun run build.ts",
-    "prepare": "bun run build.ts"
+    "build": "bun run build.ts"
   },
   "repository": {
     "type": "git",
