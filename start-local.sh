@@ -1,20 +1,24 @@
 #!/bin/bash
 
-# Zero-Trust Web Rails - Multi-Origin Local Testing
-# Starts demo servers on different localhost subdomains/ports
+# SMART Health Check-in - Multi-Origin Local Development
+# Builds and serves demo apps on different localhost subdomains/ports
+# This simulates the multi-origin deployment scenario
 
 # Cleanup function to kill all child processes
 cleanup() {
   echo ""
   echo "🛑 Stopping all servers..."
   pkill -P $$ 2>/dev/null
-  pkill -f "bunx http-server" 2>/dev/null
   exit 0
 }
 
 # Set up trap to catch Ctrl+C and other termination signals
 trap cleanup SIGINT SIGTERM
 
+echo "🔨 Building project..."
+bun build.ts
+
+echo ""
 echo "🚀 Starting SMART Health Check-in demo in multi-origin mode..."
 echo ""
 echo "This will start 3 servers:"
@@ -25,17 +29,18 @@ echo ""
 echo "Press Ctrl+C to stop all servers"
 echo ""
 
-# Function to start a server
+# Serve each app's built output from the build directory
+BUILD_DIR="build/smart-health-checkin-demo"
+
 start_server() {
-  local dir=$1
+  local app=$1
   local port=$2
   local name=$3
 
   echo "Starting $name on port $port..."
-  (cd "$dir" && bunx http-server -p $port 2>&1 | sed "s/^/[$name] /") &
+  (cd "$BUILD_DIR/$app" && bunx http-server -p $port -c-1 2>&1 | sed "s/^/[$name] /") &
 }
 
-# Start all servers
 start_server "requester" 3000 "Requester"
 start_server "checkin" 3001 "Check-in"
 start_server "source-flexpa" 3002 "Flexpa"

@@ -1,21 +1,26 @@
 /**
- * Build script for smart-health-checkin library
+ * Build script for smart-health-checkin library and demo apps
  * Run with: bun run build.ts
+ *
+ * Outputs:
+ *   dist/                    - Library builds (ES module, IIFE, types)
+ *   build/smart-health-checkin-demo/  - Static demo site for GitHub Pages
  */
 
-import { copyFileSync, mkdirSync, existsSync } from 'fs';
+import { mkdirSync, existsSync, cpSync, rmSync } from 'fs';
 import { join } from 'path';
 
 const ROOT = import.meta.dir;
 const DIST = join(ROOT, 'dist');
 const SRC = join(ROOT, 'src', 'smart-health-checkin.ts');
+const BUILD_DIR = join(ROOT, 'build', 'smart-health-checkin-demo');
 
 // Ensure dist directory exists
 if (!existsSync(DIST)) {
   mkdirSync(DIST, { recursive: true });
 }
 
-console.log('Building smart-health-checkin...');
+console.log('Building smart-health-checkin library...');
 
 // Build ES module
 const esmResult = await Bun.build({
@@ -78,32 +83,53 @@ if (tscResult.exitCode === 0) {
   console.warn('  ⚠ Type declarations failed (tsc not available or error)');
 }
 
-// Copy IIFE to target directories for demo apps
-const TARGET_DIRS = ['requester', 'checkin', 'source-flexpa'];
-const IIFE_SRC = join(DIST, 'smart-health-checkin.iife.js');
+// Build demo apps for static deployment
+// These are React apps that get built and output to build/smart-health-checkin-demo/
+const DEMO_APPS = ['requester', 'source-flexpa', 'checkin'];
 
-console.log('\nCopying to demo directories...');
-for (const dir of TARGET_DIRS) {
-  const targetDir = join(ROOT, dir);
-  if (existsSync(targetDir)) {
-    const targetFile = join(targetDir, 'shl.js');
-    copyFileSync(IIFE_SRC, targetFile);
-    console.log(`  ✓ ${dir}/shl.js`);
+console.log('\nBuilding demo apps for static deployment...');
+
+// Clean and create build directory
+if (existsSync(BUILD_DIR)) {
+  rmSync(BUILD_DIR, { recursive: true });
+}
+mkdirSync(BUILD_DIR, { recursive: true });
+
+for (const app of DEMO_APPS) {
+  const htmlPath = join(ROOT, app, 'index.html');
+  if (!existsSync(htmlPath)) {
+    console.log(`  ⚠ Skipping ${app} (index.html not found)`);
+    continue;
+  }
+
+  const outdir = join(BUILD_DIR, app);
+  mkdirSync(outdir, { recursive: true });
+
+  const result = await Bun.build({
+    entrypoints: [htmlPath],
+    outdir,
+    target: 'browser',
+    minify: true,
+  });
+
+  if (result.success) {
+    console.log(`  ✓ ${app}/`);
+  } else {
+    console.error(`  ✗ ${app} build failed:`, result.logs);
   }
 }
 
-// Copy config.js to target directories
-const CONFIG_SRC = join(ROOT, 'config.js');
-if (existsSync(CONFIG_SRC)) {
-  console.log('\nCopying config.js...');
-  for (const dir of TARGET_DIRS) {
-    const targetDir = join(ROOT, dir);
-    if (existsSync(targetDir)) {
-      const targetFile = join(targetDir, 'config.js');
-      copyFileSync(CONFIG_SRC, targetFile);
-      console.log(`  ✓ ${dir}/config.js`);
-    }
-  }
+// Copy static files that don't need building
+// - Main landing page
+if (existsSync(join(ROOT, 'index.html'))) {
+  cpSync(join(ROOT, 'index.html'), join(BUILD_DIR, 'index.html'));
+  console.log('  ✓ index.html (landing page)');
 }
+
+// - Library dist files (for CDN-style access)
+cpSync(DIST, join(BUILD_DIR, 'dist'), { recursive: true });
+console.log('  ✓ dist/ (library files)');
 
 console.log('\nBuild complete!');
+console.log(`\nStatic site ready at: build/smart-health-checkin-demo/`);
+console.log('Run ./start-static.sh to test locally');
