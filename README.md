@@ -326,9 +326,9 @@ This repository contains a fully functional reference implementation of the prot
 
 ### 4.1 Components
 
-*   **Requester (`/requester`)**: A demo "Doctor's Clinic" app that initiates the flow.
-*   **Picker (`/checkin`)**: A simple UI that helps users select their health app.
-*   **Health App (`/source-flexpa`)**: A mock health app implementation that acts as an OID4VP Provider.
+*   **Requester (`demo/requester`)**: A demo "Doctor's Clinic" app that initiates the flow.
+*   **Picker (`demo/checkin`)**: A simple UI that helps users select their health app.
+*   **Health App (`demo/source-flexpa`)**: A mock health app implementation that acts as an OID4VP Provider.
 
 ### 4.2 Running the Demo
 

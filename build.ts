@@ -84,7 +84,8 @@ if (tscResult.exitCode === 0) {
 }
 
 // Build demo apps for static deployment
-// These are React apps that get built and output to build/smart-health-checkin-demo/
+// These are React apps in demo/ that get built and output to build/smart-health-checkin-demo/
+const DEMO_DIR = join(ROOT, 'demo');
 const DEMO_APPS = ['requester', 'source-flexpa', 'checkin'];
 
 console.log('\nBuilding demo apps for static deployment...');
@@ -96,7 +97,7 @@ if (existsSync(BUILD_DIR)) {
 mkdirSync(BUILD_DIR, { recursive: true });
 
 for (const app of DEMO_APPS) {
-  const htmlPath = join(ROOT, app, 'index.html');
+  const htmlPath = join(DEMO_DIR, app, 'index.html');
   if (!existsSync(htmlPath)) {
     console.log(`  ⚠ Skipping ${app} (index.html not found)`);
     continue;
@@ -121,8 +122,8 @@ for (const app of DEMO_APPS) {
 
 // Copy static files that don't need building
 // - Main landing page
-if (existsSync(join(ROOT, 'index.html'))) {
-  cpSync(join(ROOT, 'index.html'), join(BUILD_DIR, 'index.html'));
+if (existsSync(join(DEMO_DIR, 'index.html'))) {
+  cpSync(join(DEMO_DIR, 'index.html'), join(BUILD_DIR, 'index.html'));
   console.log('  ✓ index.html (landing page)');
 }
 
